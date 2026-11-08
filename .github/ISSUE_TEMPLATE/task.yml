@@ -1,0 +1,19 @@
+name: Task
+description: Technical work that is not a feature or a bug (setup, refactor, docs, CI).
+labels: [task]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What needs to be done and why?
+    validations:
+      required: true
+  - type: textarea
+    id: done
+    attributes:
+      label: Definition of done
+      placeholder: |
+        - [ ] ...
+    validations:
+      required: true
