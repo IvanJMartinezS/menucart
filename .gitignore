@@ -24,3 +24,7 @@ Thumbs.db
 
 # Local notes (backlog, ideas, drafts) - never tracked
 .notes/
+
+# Cloudflare Workers
+.wrangler/
+.dev.vars
