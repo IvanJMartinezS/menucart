@@ -60,7 +60,8 @@ menucart/
 
 ## Getting started
 
-**Requirements:** Node.js 22 or later (24 recommended, see `.nvmrc`) and pnpm 11.
+**Requirements:** Node.js 22 or later (24 recommended, see `.nvmrc`), pnpm 11 and Docker (for the local
+database).
 
 ```bash
 pnpm install    # install dependencies
@@ -75,6 +76,18 @@ pnpm dev        # start the web app and the API
 | `pnpm lint`      | Lint the code with oxlint     |
 | `pnpm typecheck` | Check types in every package  |
 | `pnpm format`    | Format the code with Prettier |
+| `pnpm db:up`     | Start the local database      |
+| `pnpm db:down`   | Stop the local database       |
+
+### Local database
+
+Development uses PostgreSQL in Docker, defined in [`docker-compose.yml`](docker-compose.yml). Data is kept in
+a Docker volume between restarts.
+
+```bash
+pnpm db:up                                          # start Postgres on localhost:5432
+cp apps/api/.dev.vars.example apps/api/.dev.vars    # connection string for the API
+```
 
 ## Workflow
 

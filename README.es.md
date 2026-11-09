@@ -61,7 +61,8 @@ menucart/
 
 ## Cómo ejecutarlo
 
-**Requisitos:** Node.js 22 o superior (se recomienda 24, ver `.nvmrc`) y pnpm 11.
+**Requisitos:** Node.js 22 o superior (se recomienda 24, ver `.nvmrc`), pnpm 11 y Docker (para la base de
+datos local).
 
 ```bash
 pnpm install    # instalar dependencias
@@ -76,6 +77,18 @@ pnpm dev        # iniciar la web y la API
 | `pnpm lint`      | Revisa el código con oxlint         |
 | `pnpm typecheck` | Comprueba los tipos de cada paquete |
 | `pnpm format`    | Formatea el código con Prettier     |
+| `pnpm db:up`     | Inicia la base de datos local       |
+| `pnpm db:down`   | Detiene la base de datos local      |
+
+### Base de datos local
+
+En desarrollo se usa PostgreSQL en Docker, definido en [`docker-compose.yml`](docker-compose.yml). Los datos
+se conservan en un volumen de Docker entre reinicios.
+
+```bash
+pnpm db:up                                          # inicia Postgres en localhost:5432
+cp apps/api/.dev.vars.example apps/api/.dev.vars    # cadena de conexión para la API
+```
 
 ## Flujo de trabajo
 
