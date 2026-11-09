@@ -1,0 +1,22 @@
+# Local development database. Not used in production (the app uses a managed Postgres).
+name: menucart
+
+services:
+  db:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_USER: menucart
+      POSTGRES_PASSWORD: menucart
+      POSTGRES_DB: menucart
+    ports:
+      - '5432:5432'
+    volumes:
+      - db-data:/var/lib/postgresql
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U menucart -d menucart']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  db-data:
