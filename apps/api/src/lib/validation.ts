@@ -26,6 +26,14 @@ export const validateJson = <T extends ZodType>(schema: T) =>
     }
   })
 
+/** Validates the query string (for example `?q=onion`) with a Zod schema. */
+export const validateQuery = <T extends ZodType>(schema: T) =>
+  zValidator('query', schema, (result, c) => {
+    if (!result.success) {
+      return validationError(c, 'The query parameters are not valid', result.error.issues)
+    }
+  })
+
 /** Validates the URL parameters (for example `:id`) with a Zod schema. */
 export const validateParams = <T extends ZodType>(schema: T) =>
   zValidator('param', schema, (result, c) => {
