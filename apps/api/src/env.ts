@@ -4,6 +4,8 @@ import type { Database } from './db/client.ts'
 export type AppEnv = {
   Bindings: {
     DATABASE_URL: string
+    /** Web app origins allowed to call the API from a browser, comma separated. */
+    CORS_ORIGIN: string
   }
   Variables: {
     /** Database client for the current request, set by the `database` middleware. */
