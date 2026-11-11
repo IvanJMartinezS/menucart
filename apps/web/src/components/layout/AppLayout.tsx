@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { Link, NavLink, Outlet } from 'react-router'
 import { navigationItems } from './navigation.ts'
 
@@ -7,6 +8,8 @@ import { navigationItems } from './navigation.ts'
  * from tablet size up it moves to the header.
  */
 export function AppLayout() {
+  const { t } = useTranslation()
+
   return (
     <div className="min-h-dvh">
       <header className="border-b border-line bg-cream/90 backdrop-blur">
@@ -15,9 +18,9 @@ export function AppLayout() {
             Menu<span className="text-accent">Cart</span>
           </Link>
 
-          <nav aria-label="Principal" className="hidden md:block">
+          <nav aria-label={t('nav.label')} className="hidden md:block">
             <ul className="flex gap-1">
-              {navigationItems.map(({ to, label }) => (
+              {navigationItems.map(({ to, labelKey }) => (
                 <li key={to}>
                   <NavLink
                     to={to}
@@ -30,7 +33,7 @@ export function AppLayout() {
                       }`
                     }
                   >
-                    {label}
+                    {t(labelKey)}
                   </NavLink>
                 </li>
               ))}
@@ -44,11 +47,11 @@ export function AppLayout() {
       </main>
 
       <nav
-        aria-label="Principal"
+        aria-label={t('nav.label')}
         className="fixed inset-x-0 bottom-0 border-t border-line bg-surface/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden"
       >
         <ul className="grid grid-cols-4">
-          {navigationItems.map(({ to, label, icon: Icon }) => (
+          {navigationItems.map(({ to, labelKey, icon: Icon }) => (
             <li key={to}>
               <NavLink
                 to={to}
@@ -60,7 +63,7 @@ export function AppLayout() {
                 }
               >
                 <Icon aria-hidden="true" className="size-6" strokeWidth={1.75} />
-                {label}
+                {t(labelKey)}
               </NavLink>
             </li>
           ))}

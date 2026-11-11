@@ -1,19 +1,22 @@
 import { UtensilsCrossed } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { EmptyState } from '../components/ui/EmptyState.tsx'
 import { PageHeader } from '../components/ui/PageHeader.tsx'
 
 export function MenusPage() {
+  const { t } = useTranslation()
+
   return (
     <>
       <PageHeader
-        eyebrow="Tus menús"
-        title="¿Qué cocinamos esta quincena?"
-        description="Guarda tus menús una sola vez, con sus ingredientes, y elígelos cada quincena."
+        eyebrow={t('menus.eyebrow')}
+        title={t('menus.title')}
+        description={t('menus.description')}
       />
       <EmptyState
         icon={UtensilsCrossed}
-        title="Todavía no tienes menús"
-        description="Cuando agregues tus menús con sus ingredientes, aparecerán aquí."
+        title={t('menus.empty.title')}
+        description={t('menus.empty.description')}
       />
     </>
   )
