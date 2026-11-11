@@ -3,6 +3,7 @@ import { Hono } from 'hono'
 import type { AppEnv } from './env.ts'
 import { handleError, handleNotFound } from './lib/errors.ts'
 import { database } from './middleware/database.ts'
+import { ingredientsRoutes } from './routes/ingredients.ts'
 import { menusRoutes } from './routes/menus.ts'
 
 const app = new Hono<AppEnv>()
@@ -19,6 +20,7 @@ app.get('/health', async (c) => {
 })
 
 app.route('/menus', menusRoutes)
+app.route('/ingredients', ingredientsRoutes)
 
 app.onError(handleError)
 app.notFound(handleNotFound)
