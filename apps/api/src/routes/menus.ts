@@ -1,4 +1,4 @@
-import { menuInputSchema } from '@menucart/shared'
+import { type MenuIngredientInput, menuInputSchema } from '@menucart/shared'
 import { eq } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { HTTPException } from 'hono/http-exception'
@@ -7,6 +7,8 @@ import type { Database } from '../db/client.ts'
 import { menuIngredients, menus } from '../db/schema.ts'
 import type { AppEnv } from '../env.ts'
 import { validateJson, validateParams } from '../lib/validation.ts'
+
+type Transaction = Parameters<Parameters<Database['transaction']>[0]>[0]
 
 const menuIdParamSchema = z.object({ id: z.uuid() })
 
@@ -27,6 +29,13 @@ const withIngredients = {
 } as const satisfies NonNullable<Parameters<Database['query']['menus']['findMany']>[0]>['with']
 
 const menuNotFound = () => new HTTPException(404, { message: 'Menu not found' })
+
+/** Saves the ingredients of a menu, keeping their order as `position`. */
+const insertIngredients = (tx: Transaction, menuId: string, ingredients: MenuIngredientInput[]) =>
+  tx
+    .insert(menuIngredients)
+    .values(ingredients.map((ingredient, position) => ({ ...ingredient, menuId, position })))
+    .returning(ingredientColumns)
 
 export const menusRoutes = new Hono<AppEnv>()
   /** Lists every menu with its ingredients, newest first. */
@@ -69,19 +78,42 @@ export const menusRoutes = new Hono<AppEnv>()
         throw new Error('The menu was not created')
       }
 
-      const ingredients = await tx
-        .insert(menuIngredients)
-        .values(
-          input.ingredients.map((ingredient, position) => ({
-            ...ingredient,
-            menuId: created.id,
-            position,
-          })),
-        )
-        .returning(ingredientColumns)
+      const ingredients = await insertIngredients(tx, created.id, input.ingredients)
 
       return { ...created, ingredients }
     })
 
     return c.json(menu, 201)
+  })
+
+  /**
+   * Replaces a menu: name, notes and the whole list of ingredients.
+   * Notes that are not sent are cleared, because PUT sends the complete menu.
+   */
+  .put('/:id', validateParams(menuIdParamSchema), validateJson(menuInputSchema), async (c) => {
+    const { id } = c.req.valid('param')
+    const input = c.req.valid('json')
+
+    const menu = await c.var.db.transaction(async (tx) => {
+      const [updated] = await tx
+        .update(menus)
+        .set({ name: input.name, notes: input.notes ?? null })
+        .where(eq(menus.id, id))
+        .returning()
+
+      if (!updated) {
+        return undefined
+      }
+
+      await tx.delete(menuIngredients).where(eq(menuIngredients.menuId, id))
+      const ingredients = await insertIngredients(tx, id, input.ingredients)
+
+      return { ...updated, ingredients }
+    })
+
+    if (!menu) {
+      throw menuNotFound()
+    }
+
+    return c.json(menu)
   })
