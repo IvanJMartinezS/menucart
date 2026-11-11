@@ -20,3 +20,5 @@ export function createDb(databaseUrl: string) {
     close: () => client.end(),
   }
 }
+
+export type Database = ReturnType<typeof createDb>['db']
