@@ -1,5 +1,15 @@
 /** Spanish texts. This is the reference language: English must have exactly the same keys. */
 export const es = {
+  common: {
+    loading: 'Cargando…',
+    retry: 'Reintentar',
+  },
+  errors: {
+    connection: {
+      title: 'No pudimos conectar con el servidor',
+      description: 'Revisa tu conexión e inténtalo de nuevo.',
+    },
+  },
   nav: {
     label: 'Principal',
     menus: 'Menús',
@@ -16,6 +26,8 @@ export const es = {
     eyebrow: 'Tus menús',
     title: '¿Qué cocinamos esta quincena?',
     description: 'Guarda tus menús una sola vez, con sus ingredientes, y elígelos cada quincena.',
+    ingredientCount_one: '{{count}} ingrediente',
+    ingredientCount_other: '{{count}} ingredientes',
     empty: {
       title: 'Todavía no tienes menús',
       description: 'Cuando agregues tus menús con sus ingredientes, aparecerán aquí.',

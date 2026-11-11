@@ -1,15 +1,7 @@
-import { render, screen, within } from '@testing-library/react'
+import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { createMemoryRouter, RouterProvider } from 'react-router'
 import { describe, expect, it } from 'vitest'
-import { routes } from './routes.tsx'
-
-/** Renders the whole app at a given URL, without a real browser. */
-const renderAt = (path: string) => {
-  const router = createMemoryRouter(routes, { initialEntries: [path] })
-  render(<RouterProvider router={router} />)
-  return router
-}
+import { renderAt } from './test/render.tsx'
 
 /** The layout has two navigations (header and bottom bar); CSS shows only one of them. */
 const firstNavigation = () => within(screen.getAllByRole('navigation', { name: 'Principal' })[0]!)
