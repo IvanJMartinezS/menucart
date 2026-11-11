@@ -106,6 +106,19 @@ pnpm db:migrate
 
 Migrations already applied are skipped, so `pnpm db:migrate` is safe to run at any time.
 
+### Tests
+
+API tests are integration tests: they send real requests to the API and use a separate `menucart_test`
+database, created and migrated automatically, so they never touch development data. They need the local
+database running:
+
+```bash
+pnpm db:up
+pnpm test
+```
+
+In CI, GitHub Actions starts its own Postgres service for them.
+
 ## Workflow
 
 - **GitHub Flow:** `main` is always deployable and protected; every change goes through a short-lived branch
