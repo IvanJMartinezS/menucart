@@ -1,19 +1,22 @@
 import { ClipboardList } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { EmptyState } from '../components/ui/EmptyState.tsx'
 import { PageHeader } from '../components/ui/PageHeader.tsx'
 
 export function ShoppingListPage() {
+  const { t } = useTranslation()
+
   return (
     <>
       <PageHeader
-        eyebrow="Lista de compras"
-        title="Todo lo que hay que comprar"
-        description="Los ingredientes de tus menús y tus víveres, sumados y agrupados como en el mercado."
+        eyebrow={t('shoppingList.eyebrow')}
+        title={t('shoppingList.title')}
+        description={t('shoppingList.description')}
       />
       <EmptyState
         icon={ClipboardList}
-        title="Tu lista está vacía"
-        description="La lista se arma sola a partir de la quincena."
+        title={t('shoppingList.empty.title')}
+        description={t('shoppingList.empty.description')}
       />
     </>
   )
