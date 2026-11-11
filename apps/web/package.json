@@ -16,6 +16,7 @@
     "@hookform/resolvers": "^7.0.3",
     "@menucart/shared": "workspace:*",
     "@tanstack/react-query": "^5.107.1",
+    "hono": "^4.13.16",
     "i18next": "^26.7.2",
     "i18next-browser-languagedetector": "^8.3.0",
     "lucide-react": "^1.70.0",
@@ -27,6 +28,7 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@menucart/api": "workspace:*",
     "@tailwindcss/vite": "^4.3.5",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
