@@ -117,3 +117,16 @@ export const menusRoutes = new Hono<AppEnv>()
 
     return c.json(menu)
   })
+
+  /** Deletes a menu. Its ingredients are deleted by the database (`ON DELETE CASCADE`). */
+  .delete('/:id', validateParams(menuIdParamSchema), async (c) => {
+    const { id } = c.req.valid('param')
+
+    const deleted = await c.var.db.delete(menus).where(eq(menus.id, id)).returning({ id: menus.id })
+
+    if (deleted.length === 0) {
+      throw menuNotFound()
+    }
+
+    return c.body(null, 204)
+  })
