@@ -2,6 +2,7 @@ import { sql } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { createDb } from './db/client.ts'
 import type { AppEnv } from './env.ts'
+import { handleError, handleNotFound } from './lib/errors.ts'
 
 const app = new Hono<AppEnv>()
 
@@ -17,5 +18,8 @@ app.get('/health', async (c) => {
     c.executionCtx.waitUntil(close())
   }
 })
+
+app.onError(handleError)
+app.notFound(handleNotFound)
 
 export default app
