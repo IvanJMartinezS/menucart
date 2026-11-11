@@ -1,3 +1,4 @@
+import { ingredientCategories } from '@menucart/shared'
 import { sql } from 'drizzle-orm'
 import {
   check,
@@ -12,7 +13,7 @@ import {
 } from 'drizzle-orm/pg-core'
 
 /** Where an ingredient shows up in the shopping list. Labels are translated in the web app. */
-export const ingredientCategory = pgEnum('ingredient_category', ['meat', 'vegetables'])
+export const ingredientCategory = pgEnum('ingredient_category', ingredientCategories)
 
 export const menus = pgTable('menus', {
   id: uuid('id').primaryKey().defaultRandom(),
