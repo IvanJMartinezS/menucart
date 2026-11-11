@@ -69,16 +69,17 @@ pnpm install    # instalar dependencias
 pnpm dev        # iniciar la web y la API
 ```
 
-| Comando          | Descripción                         |
-| ---------------- | ----------------------------------- |
-| `pnpm dev`       | Inicia la web y la API              |
-| `pnpm build`     | Compila todos los paquetes          |
-| `pnpm test`      | Ejecuta los tests                   |
-| `pnpm lint`      | Revisa el código con oxlint         |
-| `pnpm typecheck` | Comprueba los tipos de cada paquete |
-| `pnpm format`    | Formatea el código con Prettier     |
-| `pnpm db:up`     | Inicia la base de datos local       |
-| `pnpm db:down`   | Detiene la base de datos local      |
+| Comando           | Descripción                         |
+| ----------------- | ----------------------------------- |
+| `pnpm dev`        | Inicia la web y la API              |
+| `pnpm build`      | Compila todos los paquetes          |
+| `pnpm test`       | Ejecuta los tests                   |
+| `pnpm lint`       | Revisa el código con oxlint         |
+| `pnpm typecheck`  | Comprueba los tipos de cada paquete |
+| `pnpm format`     | Formatea el código con Prettier     |
+| `pnpm db:up`      | Inicia la base de datos local       |
+| `pnpm db:down`    | Detiene la base de datos local      |
+| `pnpm db:migrate` | Aplica las migraciones pendientes   |
 
 ### Base de datos local
 
@@ -88,7 +89,24 @@ se conservan en un volumen de Docker entre reinicios.
 ```bash
 pnpm db:up                                          # inicia Postgres en localhost:5432
 cp apps/api/.dev.vars.example apps/api/.dev.vars    # cadena de conexión para la API
+pnpm db:migrate                                     # crea las tablas
 ```
+
+### Migraciones de la base de datos
+
+El esquema se define con Drizzle en [`apps/api/src/db/schema.ts`](apps/api/src/db/schema.ts). Cada cambio se
+convierte en una migración SQL versionada en [`apps/api/drizzle/`](apps/api/drizzle), que se sube junto con
+el código.
+
+```bash
+# 1. Editar apps/api/src/db/schema.ts
+# 2. Generar la migración SQL a partir de los cambios
+pnpm --filter @menucart/api db:generate --name descripcion_corta
+# 3. Revisar el SQL generado y aplicarlo
+pnpm db:migrate
+```
+
+Las migraciones ya aplicadas se omiten, así que `pnpm db:migrate` se puede ejecutar en cualquier momento.
 
 ## Flujo de trabajo
 

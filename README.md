@@ -68,16 +68,17 @@ pnpm install    # install dependencies
 pnpm dev        # start the web app and the API
 ```
 
-| Command          | Description                   |
-| ---------------- | ----------------------------- |
-| `pnpm dev`       | Start the web app and the API |
-| `pnpm build`     | Build every package           |
-| `pnpm test`      | Run the tests                 |
-| `pnpm lint`      | Lint the code with oxlint     |
-| `pnpm typecheck` | Check types in every package  |
-| `pnpm format`    | Format the code with Prettier |
-| `pnpm db:up`     | Start the local database      |
-| `pnpm db:down`   | Stop the local database       |
+| Command           | Description                       |
+| ----------------- | --------------------------------- |
+| `pnpm dev`        | Start the web app and the API     |
+| `pnpm build`      | Build every package               |
+| `pnpm test`       | Run the tests                     |
+| `pnpm lint`       | Lint the code with oxlint         |
+| `pnpm typecheck`  | Check types in every package      |
+| `pnpm format`     | Format the code with Prettier     |
+| `pnpm db:up`      | Start the local database          |
+| `pnpm db:down`    | Stop the local database           |
+| `pnpm db:migrate` | Apply pending database migrations |
 
 ### Local database
 
@@ -87,7 +88,23 @@ a Docker volume between restarts.
 ```bash
 pnpm db:up                                          # start Postgres on localhost:5432
 cp apps/api/.dev.vars.example apps/api/.dev.vars    # connection string for the API
+pnpm db:migrate                                     # create the tables
 ```
+
+### Database migrations
+
+The schema is defined with Drizzle in [`apps/api/src/db/schema.ts`](apps/api/src/db/schema.ts). Every change
+to it becomes a versioned SQL migration in [`apps/api/drizzle/`](apps/api/drizzle), committed with the code.
+
+```bash
+# 1. Edit apps/api/src/db/schema.ts
+# 2. Generate the SQL migration from the changes
+pnpm --filter @menucart/api db:generate --name short_description
+# 3. Review the generated SQL, then apply it
+pnpm db:migrate
+```
+
+Migrations already applied are skipped, so `pnpm db:migrate` is safe to run at any time.
 
 ## Workflow
 
