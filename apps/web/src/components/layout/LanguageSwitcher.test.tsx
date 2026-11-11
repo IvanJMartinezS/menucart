@@ -1,13 +1,10 @@
-import { render, screen, within } from '@testing-library/react'
+import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { createMemoryRouter, RouterProvider } from 'react-router'
 import { describe, expect, it } from 'vitest'
 import { LANGUAGE_STORAGE_KEY } from '../../i18n/index.ts'
-import { routes } from '../../routes.tsx'
+import { renderAt } from '../../test/render.tsx'
 
-const renderApp = () => {
-  render(<RouterProvider router={createMemoryRouter(routes, { initialEntries: ['/'] })} />)
-}
+const renderApp = () => renderAt('/')
 
 const languageSwitcher = () => within(screen.getByRole('group', { name: /idioma|language/i }))
 

@@ -2,6 +2,16 @@ import type { es } from './es.ts'
 
 /** English texts. Typed with the shape of Spanish, so a missing key is a compile error. */
 export const en: typeof es = {
+  common: {
+    loading: 'Loading…',
+    retry: 'Try again',
+  },
+  errors: {
+    connection: {
+      title: 'We could not reach the server',
+      description: 'Check your connection and try again.',
+    },
+  },
   nav: {
     label: 'Main',
     menus: 'Menus',
@@ -18,6 +28,8 @@ export const en: typeof es = {
     eyebrow: 'Your menus',
     title: 'What are we cooking these two weeks?',
     description: 'Save your menus once, with their ingredients, and pick them every two weeks.',
+    ingredientCount_one: '{{count}} ingredient',
+    ingredientCount_other: '{{count}} ingredients',
     empty: {
       title: 'You have no menus yet',
       description: 'Once you add your menus with their ingredients, they will show up here.',
