@@ -1,21 +1,19 @@
 import { sql } from 'drizzle-orm'
 import { Hono } from 'hono'
-import { createDb } from './db/client.ts'
 import type { AppEnv } from './env.ts'
 import { handleError, handleNotFound } from './lib/errors.ts'
+import { database } from './middleware/database.ts'
 
 const app = new Hono<AppEnv>()
 
-app.get('/health', async (c) => {
-  const { db, close } = createDb(c.env.DATABASE_URL)
+app.use(database)
 
+app.get('/health', async (c) => {
   try {
-    await db.execute(sql`select 1`)
+    await c.var.db.execute(sql`select 1`)
     return c.json({ status: 'ok', database: 'up' })
   } catch {
     return c.json({ status: 'error', database: 'down' }, 503)
-  } finally {
-    c.executionCtx.waitUntil(close())
   }
 })
 
