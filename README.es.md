@@ -81,15 +81,29 @@ pnpm dev        # iniciar la web y la API
 | `pnpm db:down`    | Detiene la base de datos local      |
 | `pnpm db:migrate` | Aplica las migraciones pendientes   |
 
+### Configuración
+
+La configuración local va en archivos que no se suben al repositorio. Se crean a partir de los ejemplos:
+
+```bash
+cp apps/api/.dev.vars.example apps/api/.dev.vars    # API: conexión a la base de datos
+cp apps/web/.env.example apps/web/.env.local        # web: dónde está la API
+```
+
+| Variable       | Dónde                     | Descripción                                                                           |
+| -------------- | ------------------------- | ------------------------------------------------------------------------------------- |
+| `DATABASE_URL` | `apps/api/.dev.vars`      | Cadena de conexión a Postgres                                                         |
+| `CORS_ORIGIN`  | `apps/api/wrangler.jsonc` | Orígenes de la web que pueden llamar a la API desde un navegador, separados por comas |
+| `VITE_API_URL` | `apps/web/.env.local`     | URL de la API que usa la web                                                          |
+
 ### Base de datos local
 
 En desarrollo se usa PostgreSQL en Docker, definido en [`docker-compose.yml`](docker-compose.yml). Los datos
 se conservan en un volumen de Docker entre reinicios.
 
 ```bash
-pnpm db:up                                          # inicia Postgres en localhost:5432
-cp apps/api/.dev.vars.example apps/api/.dev.vars    # cadena de conexión para la API
-pnpm db:migrate                                     # crea las tablas
+pnpm db:up         # inicia Postgres en localhost:5432
+pnpm db:migrate    # crea las tablas
 ```
 
 ### Migraciones de la base de datos
