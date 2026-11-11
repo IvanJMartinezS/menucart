@@ -1,5 +1,5 @@
 import { ingredientCategories } from '@menucart/shared'
-import { sql } from 'drizzle-orm'
+import { relations, sql } from 'drizzle-orm'
 import {
   check,
   index,
@@ -44,3 +44,11 @@ export const menuIngredients = pgTable(
     check('menu_ingredients_quantity_positive', sql`${table.quantity} > 0`),
   ],
 )
+
+export const menusRelations = relations(menus, ({ many }) => ({
+  ingredients: many(menuIngredients),
+}))
+
+export const menuIngredientsRelations = relations(menuIngredients, ({ one }) => ({
+  menu: one(menus, { fields: [menuIngredients.menuId], references: [menus.id] }),
+}))
