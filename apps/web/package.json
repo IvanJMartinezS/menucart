@@ -11,11 +11,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fontsource-variable/fraunces": "^5.3.0",
+    "@fontsource-variable/plus-jakarta-sans": "^5.3.0",
     "@hookform/resolvers": "^7.0.3",
     "@menucart/shared": "workspace:*",
     "@tanstack/react-query": "^5.107.1",
     "i18next": "^26.7.2",
     "i18next-browser-languagedetector": "^8.3.0",
+    "lucide-react": "^1.70.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "react-hook-form": "^7.91.0",
