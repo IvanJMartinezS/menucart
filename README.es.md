@@ -108,6 +108,19 @@ pnpm db:migrate
 
 Las migraciones ya aplicadas se omiten, así que `pnpm db:migrate` se puede ejecutar en cualquier momento.
 
+### Tests
+
+Los tests de la API son de integración: envían peticiones reales a la API y usan una base de datos aparte,
+`menucart_test`, que se crea y migra sola, así que nunca tocan los datos de desarrollo. Necesitan la base de
+datos local encendida:
+
+```bash
+pnpm db:up
+pnpm test
+```
+
+En la CI, GitHub Actions levanta su propio servicio de Postgres para ellos.
+
 ## Flujo de trabajo
 
 - **GitHub Flow:** `main` siempre está lista para desplegar y está protegida; cada cambio pasa por una rama
