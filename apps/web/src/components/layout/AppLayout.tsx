@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { Link, NavLink, Outlet } from 'react-router'
+import { LanguageSwitcher } from './LanguageSwitcher.tsx'
 import { navigationItems } from './navigation.ts'
 
 /**
@@ -13,32 +14,36 @@ export function AppLayout() {
   return (
     <div className="min-h-dvh">
       <header className="border-b border-line bg-cream/90 backdrop-blur">
-        <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4">
+        <div className="mx-auto flex h-16 max-w-5xl items-center justify-between gap-4 px-4">
           <Link to="/" className="font-display text-2xl font-semibold tracking-tight">
             Menu<span className="text-accent">Cart</span>
           </Link>
 
-          <nav aria-label={t('nav.label')} className="hidden md:block">
-            <ul className="flex gap-1">
-              {navigationItems.map(({ to, labelKey }) => (
-                <li key={to}>
-                  <NavLink
-                    to={to}
-                    end
-                    className={({ isActive }) =>
-                      `rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
-                        isActive
-                          ? 'bg-ink text-cream'
-                          : 'text-muted hover:bg-line/60 hover:text-ink'
-                      }`
-                    }
-                  >
-                    {t(labelKey)}
-                  </NavLink>
-                </li>
-              ))}
-            </ul>
-          </nav>
+          <div className="flex items-center gap-4">
+            <nav aria-label={t('nav.label')} className="hidden md:block">
+              <ul className="flex gap-1">
+                {navigationItems.map(({ to, labelKey }) => (
+                  <li key={to}>
+                    <NavLink
+                      to={to}
+                      end
+                      className={({ isActive }) =>
+                        `rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
+                          isActive
+                            ? 'bg-ink text-cream'
+                            : 'text-muted hover:bg-line/60 hover:text-ink'
+                        }`
+                      }
+                    >
+                      {t(labelKey)}
+                    </NavLink>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+
+            <LanguageSwitcher />
+          </div>
         </div>
       </header>
 
