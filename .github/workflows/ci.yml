@@ -20,6 +20,21 @@ jobs:
     timeout-minutes: 10
     env:
       WRANGLER_SEND_METRICS: false
+    # Database for the API integration tests, with the same credentials as docker-compose.yml.
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: menucart
+          POSTGRES_PASSWORD: menucart
+          POSTGRES_DB: menucart
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U menucart -d menucart"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
     steps:
       - name: Checkout
         uses: actions/checkout@v7
