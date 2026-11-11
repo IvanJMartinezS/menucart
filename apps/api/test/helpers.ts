@@ -2,7 +2,7 @@ import postgres from 'postgres'
 import app from '../src/index.ts'
 import { TEST_DATABASE_URL } from './database.ts'
 
-const env = { DATABASE_URL: TEST_DATABASE_URL }
+const env = { DATABASE_URL: TEST_DATABASE_URL, CORS_ORIGIN: 'http://localhost:5173' }
 
 /** Minimal stand-in for the Workers execution context, which does not exist outside Cloudflare. */
 const executionCtx = {

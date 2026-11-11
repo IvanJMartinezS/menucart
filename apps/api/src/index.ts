@@ -2,12 +2,14 @@ import { sql } from 'drizzle-orm'
 import { Hono } from 'hono'
 import type { AppEnv } from './env.ts'
 import { handleError, handleNotFound } from './lib/errors.ts'
+import { cors } from './middleware/cors.ts'
 import { database } from './middleware/database.ts'
 import { ingredientsRoutes } from './routes/ingredients.ts'
 import { menusRoutes } from './routes/menus.ts'
 
 const app = new Hono<AppEnv>()
 
+app.use(cors)
 app.use(database)
 
 app.get('/health', async (c) => {
