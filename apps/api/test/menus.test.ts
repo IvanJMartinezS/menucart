@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import type { ErrorBody } from '../src/lib/errors.ts'
-import { postJson, request, resetDatabase } from './helpers.ts'
+import { postJson, putJson, request, resetDatabase } from './helpers.ts'
 
 type Ingredient = {
   id: string
@@ -35,6 +35,11 @@ const pabellon = {
 }
 
 const listMenus = async () => (await request('/menus')).json<Menu[]>()
+
+const createMenu = async (body: object) => (await postJson('/menus', body)).json<Menu>()
+
+/** A valid id that does not belong to any menu. */
+const missingId = '00000000-0000-4000-8000-000000000000'
 
 beforeEach(resetDatabase)
 
@@ -140,5 +145,104 @@ describe('unknown routes', () => {
 
     expect(response.status).toBe(404)
     expect(await response.json()).toEqual({ error: 'not_found', message: 'Route not found' })
+  })
+})
+
+describe('GET /menus/:id', () => {
+  it('returns the menu with its ingredients', async () => {
+    const created = await createMenu(bistec)
+
+    const response = await request(`/menus/${created.id}`)
+
+    expect(response.status).toBe(200)
+    expect(await response.json()).toEqual(created)
+  })
+
+  it('answers 404 when the menu does not exist', async () => {
+    const response = await request(`/menus/${missingId}`)
+
+    expect(response.status).toBe(404)
+    expect(await response.json()).toEqual({ error: 'not_found', message: 'Menu not found' })
+  })
+
+  it('answers 400 when the id is not a valid uuid', async () => {
+    const response = await request('/menus/123')
+    const body = await response.json<ErrorBody>()
+
+    expect(response.status).toBe(400)
+    expect(body.error).toBe('validation_error')
+    expect(body.details?.[0]?.path).toBe('id')
+  })
+})
+
+describe('PUT /menus/:id', () => {
+  const updatedBistec = {
+    name: 'Bistec encebollado',
+    ingredients: [
+      { name: 'bistec', quantity: 4, category: 'meat' },
+      { name: 'cebolla', quantity: 2, category: 'vegetables' },
+    ],
+  }
+
+  it('replaces the name, the notes and the ingredients', async () => {
+    const created = await createMenu(bistec)
+
+    const response = await putJson(`/menus/${created.id}`, updatedBistec)
+    const menu = await response.json<Menu>()
+
+    expect(response.status).toBe(200)
+    expect(menu).toMatchObject({ id: created.id, name: 'Bistec encebollado', notes: null })
+    expect(menu.ingredients.map(({ name, position }) => [name, position])).toEqual([
+      ['bistec', 0],
+      ['cebolla', 1],
+    ])
+    expect(menu.updatedAt).not.toBe(created.updatedAt)
+    expect(menu.createdAt).toBe(created.createdAt)
+  })
+
+  it('saves the changes', async () => {
+    const created = await createMenu(bistec)
+    await putJson(`/menus/${created.id}`, updatedBistec)
+
+    const menu = await (await request(`/menus/${created.id}`)).json<Menu>()
+
+    expect(menu.name).toBe('Bistec encebollado')
+    expect(menu.ingredients).toHaveLength(2)
+  })
+
+  it('answers 400 and changes nothing when the body is not valid', async () => {
+    const created = await createMenu(bistec)
+
+    const response = await putJson(`/menus/${created.id}`, { ...updatedBistec, ingredients: [] })
+
+    expect(response.status).toBe(400)
+    expect(await (await request(`/menus/${created.id}`)).json()).toEqual(created)
+  })
+
+  it('answers 404 and creates nothing when the menu does not exist', async () => {
+    const response = await putJson(`/menus/${missingId}`, updatedBistec)
+
+    expect(response.status).toBe(404)
+    expect(await listMenus()).toEqual([])
+  })
+})
+
+describe('DELETE /menus/:id', () => {
+  it('deletes the menu and its ingredients', async () => {
+    const created = await createMenu(bistec)
+    const kept = await createMenu(pabellon)
+
+    const response = await request(`/menus/${created.id}`, { method: 'DELETE' })
+
+    expect(response.status).toBe(204)
+    expect(await response.text()).toBe('')
+    expect((await request(`/menus/${created.id}`)).status).toBe(404)
+    expect(await listMenus()).toEqual([kept])
+  })
+
+  it('answers 404 when the menu does not exist', async () => {
+    const response = await request(`/menus/${missingId}`, { method: 'DELETE' })
+
+    expect(response.status).toBe(404)
   })
 })

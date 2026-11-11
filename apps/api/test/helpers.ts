@@ -15,12 +15,16 @@ const executionCtx = {
 export const request = (path: string, init?: RequestInit) =>
   app.request(path, init, env, executionCtx)
 
-export const postJson = (path: string, body: unknown) =>
+const sendJson = (method: 'POST' | 'PUT', path: string, body: unknown) =>
   request(path, {
-    method: 'POST',
+    method,
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   })
+
+export const postJson = (path: string, body: unknown) => sendJson('POST', path, body)
+
+export const putJson = (path: string, body: unknown) => sendJson('PUT', path, body)
 
 /** Empties every table so each test starts from a clean database. */
 export async function resetDatabase() {
