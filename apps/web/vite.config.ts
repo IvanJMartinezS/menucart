@@ -13,9 +13,10 @@ export default defineConfig({
       manifest: {
         name: 'MenuCart',
         short_name: 'MenuCart',
-        description: 'From your menus to your shopping list.',
-        theme_color: '#ffffff',
-        background_color: '#ffffff',
+        description: 'De tus menús a tu lista de compras.',
+        lang: 'es',
+        theme_color: '#f7f2e9',
+        background_color: '#f7f2e9',
         display: 'standalone',
       },
     }),

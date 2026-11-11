@@ -1,1 +1,27 @@
 @import 'tailwindcss';
+
+/*
+ * Design tokens. Direction chosen from the sketches: "delivery app" structure
+ * with an editorial feel (cream background, serif titles, warm accent).
+ * Text colors keep at least 4.5:1 contrast on both cream and white.
+ */
+@theme {
+  --color-cream: #f7f2e9;
+  --color-surface: #ffffff;
+  --color-ink: #2b2620;
+  --color-muted: #675e55;
+  --color-line: #e6ddcf;
+  --color-accent: #c2410c;
+  --color-accent-strong: #9a3412;
+  --color-accent-soft: #fdecdf;
+  --color-olive: #4a5a2f;
+
+  --font-display: 'Fraunces Variable', Georgia, serif;
+  --font-sans: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-cream font-sans text-ink antialiased;
+  }
+}
