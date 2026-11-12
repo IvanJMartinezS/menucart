@@ -31,7 +31,7 @@ export async function resetDatabase() {
   const sql = postgres(TEST_DATABASE_URL, { max: 1, onnotice: () => {} })
 
   try {
-    await sql`truncate table menus cascade`
+    await sql`truncate table menus, groceries cascade`
   } finally {
     await sql.end()
   }
