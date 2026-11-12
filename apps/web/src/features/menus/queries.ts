@@ -65,3 +65,25 @@ export function useSaveMenu(id?: string) {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: menuKeys.all }),
   })
 }
+
+/**
+ * Deletes a menu. Afterwards, the menu is removed from the cache and the list is marked as
+ * outdated, so no screen keeps showing it.
+ */
+export function useDeleteMenu(id: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async () => {
+      const response = await api.menus[':id'].$delete({ param: { id } })
+
+      if (!response.ok) {
+        throw new ApiError(response.status)
+      }
+    },
+    onSuccess: async () => {
+      queryClient.removeQueries({ queryKey: menuKeys.detail(id) })
+      await queryClient.invalidateQueries({ queryKey: menuKeys.all })
+    },
+  })
+}
