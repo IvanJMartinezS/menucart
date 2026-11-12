@@ -1,7 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
-import { UtensilsCrossed } from 'lucide-react'
+import { Plus, UtensilsCrossed } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
+import { ButtonLink } from '../components/ui/ButtonLink.tsx'
 import { EmptyState } from '../components/ui/EmptyState.tsx'
 import { ErrorState } from '../components/ui/ErrorState.tsx'
 import { PageHeader } from '../components/ui/PageHeader.tsx'
@@ -51,7 +52,11 @@ export function MenusPage() {
         icon={UtensilsCrossed}
         title={t('menus.empty.title')}
         description={t('menus.empty.description')}
-      />
+      >
+        <ButtonLink to="/menus/new" icon={Plus}>
+          {t('menus.add')}
+        </ButtonLink>
+      </EmptyState>
     )
   } else {
     content = (
@@ -71,6 +76,14 @@ export function MenusPage() {
         eyebrow={t('menus.eyebrow')}
         title={t('menus.title')}
         description={t('menus.description')}
+        action={
+          // The empty state already shows this action.
+          menus && menus.length > 0 ? (
+            <ButtonLink to="/menus/new" icon={Plus}>
+              {t('menus.add')}
+            </ButtonLink>
+          ) : undefined
+        }
       />
       {content}
     </>

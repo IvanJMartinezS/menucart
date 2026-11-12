@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react'
+import { MemoryRouter } from 'react-router'
 import { describe, expect, it } from 'vitest'
 import { MenuCard } from './MenuCard.tsx'
 import type { Menu } from './queries.ts'
@@ -20,9 +21,17 @@ const menuWith = (names: string[]): Menu => ({
   ingredients: names.map(ingredient),
 })
 
+/** The card contains a link, so it needs a router around it. */
+const renderCard = (menu: Menu) =>
+  render(
+    <MemoryRouter>
+      <MenuCard menu={menu} />
+    </MemoryRouter>,
+  )
+
 describe('MenuCard', () => {
   it('shows the name as the title of the card', () => {
-    render(<MenuCard menu={menuWith(['bistec'])} />)
+    renderCard(menuWith(['bistec']))
 
     expect(
       screen.getByRole('article', { name: 'Bistec con ensalada y maduro' }),
@@ -33,22 +42,31 @@ describe('MenuCard', () => {
   })
 
   it('lists all the ingredients when there are few', () => {
-    render(<MenuCard menu={menuWith(['bistec', 'maduro', 'tomate'])} />)
+    renderCard(menuWith(['bistec', 'maduro', 'tomate']))
 
     expect(screen.getByText('3 ingredientes')).toBeInTheDocument()
     expect(screen.getByText('bistec, maduro, tomate')).toBeInTheDocument()
   })
 
   it('shows the first ingredients and how many more there are', () => {
-    render(<MenuCard menu={menuWith(['bistec', 'maduro', 'tomate', 'cebolla', 'lechuga'])} />)
+    renderCard(menuWith(['bistec', 'maduro', 'tomate', 'cebolla', 'lechuga']))
 
     expect(screen.getByText('5 ingredientes')).toBeInTheDocument()
     expect(screen.getByText('bistec, maduro, tomate y 2 más')).toBeInTheDocument()
   })
 
   it('hides the decorative cover from screen readers', () => {
-    const { container } = render(<MenuCard menu={menuWith(['bistec'])} />)
+    const { container } = renderCard(menuWith(['bistec']))
 
     expect(container.querySelector('[aria-hidden="true"]')).toHaveTextContent('B')
+  })
+
+  it('opens the menu to edit it', () => {
+    renderCard(menuWith(['bistec']))
+
+    expect(screen.getByRole('link', { name: 'Bistec con ensalada y maduro' })).toHaveAttribute(
+      'href',
+      '/menus/c03af067-7989-4135-beb8-7e24a9f128ee/edit',
+    )
   })
 })

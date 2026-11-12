@@ -27,6 +27,7 @@ export const es = {
     eyebrow: 'Tus menús',
     title: '¿Qué cocinamos esta quincena?',
     description: 'Guarda tus menús una sola vez, con sus ingredientes, y elígelos cada quincena.',
+    add: 'Agregar menú',
     ingredientCount_one: '{{count}} ingrediente',
     ingredientCount_other: '{{count}} ingredientes',
     moreIngredients_one: 'y {{count}} más',

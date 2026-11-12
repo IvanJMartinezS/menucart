@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import { Link } from 'react-router'
 import { coverColorFor } from './cover.ts'
 import type { Menu } from './queries.ts'
 
@@ -12,6 +13,7 @@ type MenuCardProps = {
 /**
  * A menu in the catalog: a cover (a colored tile with the initial until menus have photos),
  * the name, the number of ingredients and the first ones.
+ * The whole card opens the menu: its title is a link stretched over the card.
  */
 export function MenuCard({ menu }: MenuCardProps) {
   const { t } = useTranslation()
@@ -22,7 +24,7 @@ export function MenuCard({ menu }: MenuCardProps) {
   return (
     <article
       aria-labelledby={titleId}
-      className="flex h-full flex-col overflow-hidden rounded-3xl border border-line bg-surface shadow-sm"
+      className="relative flex h-full flex-col overflow-hidden rounded-3xl border border-line bg-surface shadow-sm transition-colors focus-within:ring-2 focus-within:ring-accent hover:border-ink/40"
     >
       <div
         aria-hidden="true"
@@ -36,7 +38,12 @@ export function MenuCard({ menu }: MenuCardProps) {
 
       <div className="flex flex-1 flex-col gap-1 p-4">
         <h2 id={titleId} className="line-clamp-2 font-display text-lg leading-snug font-medium">
-          {menu.name}
+          <Link
+            to={`/menus/${menu.id}/edit`}
+            className="after:absolute after:inset-0 focus:outline-none"
+          >
+            {menu.name}
+          </Link>
         </h2>
         <p className="text-sm font-semibold text-accent-strong">
           {t('menus.ingredientCount', { count: menu.ingredients.length })}
