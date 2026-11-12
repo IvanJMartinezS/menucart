@@ -9,7 +9,7 @@ export function NotFoundPage() {
   return (
     <EmptyState icon={SearchX} title={t('notFound.title')} description={t('notFound.description')}>
       <Link
-        to="/"
+        to="/menus"
         className="inline-flex min-h-11 items-center rounded-full bg-accent px-6 font-semibold text-white transition-colors hover:bg-accent-strong"
       >
         {t('notFound.back')}

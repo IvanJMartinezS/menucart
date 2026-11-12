@@ -41,6 +41,15 @@ describe('app routes', () => {
 
     await userEvent.click(screen.getByRole('link', { name: 'Volver a los menús' }))
 
-    expect(router.state.location.pathname).toBe('/')
+    expect(router.state.location.pathname).toBe('/menus')
+  })
+
+  it('opens the menus when visiting the root address', async () => {
+    const router = renderAt('/')
+
+    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent(
+      '¿Qué cocinamos esta quincena?',
+    )
+    expect(router.state.location.pathname).toBe('/menus')
   })
 })

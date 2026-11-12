@@ -26,7 +26,6 @@ export function AppLayout() {
                   <li key={to}>
                     <NavLink
                       to={to}
-                      end
                       className={({ isActive }) =>
                         `rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
                           isActive
@@ -60,7 +59,6 @@ export function AppLayout() {
             <li key={to}>
               <NavLink
                 to={to}
-                end
                 className={({ isActive }) =>
                   `flex min-h-16 flex-col items-center justify-center gap-1 text-xs font-semibold transition-colors ${
                     isActive ? 'text-accent' : 'text-muted hover:text-ink'
