@@ -29,6 +29,7 @@ export const en: typeof es = {
     eyebrow: 'Your menus',
     title: 'What are we cooking these two weeks?',
     description: 'Save your menus once, with their ingredients, and pick them every two weeks.',
+    add: 'Add menu',
     ingredientCount_one: '{{count}} ingredient',
     ingredientCount_other: '{{count}} ingredients',
     moreIngredients_one: 'and {{count}} more',
