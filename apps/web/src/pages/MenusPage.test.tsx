@@ -98,3 +98,27 @@ describe('MenusPage catalog', () => {
     expect(screen.getByRole('article', { name: 'Pabellón criollo' })).toBeInTheDocument()
   })
 })
+
+describe('MenusPage retry', () => {
+  it('does not say "still" after the first error', async () => {
+    vi.mocked(fetch).mockRejectedValueOnce(new TypeError('Failed to fetch'))
+
+    renderAt('/')
+
+    expect(await screen.findByRole('alert')).not.toHaveTextContent('Seguimos sin conexión')
+  })
+
+  it('says it is still failing, with the time of the last attempt, when a retry fails', async () => {
+    vi.mocked(fetch)
+      .mockRejectedValueOnce(new TypeError('Failed to fetch'))
+      .mockRejectedValueOnce(new TypeError('Failed to fetch'))
+
+    renderAt('/')
+    await userEvent.click(await screen.findByRole('button', { name: 'Reintentar' }))
+
+    expect(
+      await screen.findByText(/Seguimos sin conexión \(último intento a las .+\)/),
+    ).toBeInTheDocument()
+    expect(vi.mocked(fetch)).toHaveBeenCalledTimes(2)
+  })
+})

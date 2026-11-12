@@ -10,6 +10,7 @@ export const en: typeof es = {
     connection: {
       title: 'We could not reach the server',
       description: 'Check your connection and try again.',
+      stillFailing: 'Still no connection (last attempt at {{time}}).',
     },
   },
   nav: {

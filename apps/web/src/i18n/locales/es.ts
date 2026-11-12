@@ -8,6 +8,7 @@ export const es = {
     connection: {
       title: 'No pudimos conectar con el servidor',
       description: 'Revisa tu conexión e inténtalo de nuevo.',
+      stillFailing: 'Seguimos sin conexión (último intento a las {{time}}).',
     },
   },
   nav: {
