@@ -1,7 +1,8 @@
 import type { ErrorHandler, NotFoundHandler } from 'hono'
 import { HTTPException } from 'hono/http-exception'
 
-export type ErrorCode = 'bad_request' | 'validation_error' | 'not_found' | 'internal_error'
+export type ErrorCode =
+  'bad_request' | 'validation_error' | 'not_found' | 'conflict' | 'internal_error'
 
 export type ValidationIssue = {
   /** Location of the invalid field, for example `ingredients.0.quantity`. */
@@ -19,6 +20,7 @@ export type ErrorBody = {
 const errorCodeByStatus: Record<number, ErrorCode> = {
   400: 'bad_request',
   404: 'not_found',
+  409: 'conflict',
 }
 
 export const handleError: ErrorHandler = (err, c) => {
