@@ -1,3 +1,4 @@
+import type { IngredientCategory } from '@menucart/shared'
 import { sql } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { z } from 'zod'
@@ -30,7 +31,7 @@ export const ingredientsRoutes = new Hono<AppEnv>()
     const suggestions = await c.var.db
       .select({
         name: sql<string>`mode() within group (order by ${menuIngredients.name})`,
-        category: sql<string>`mode() within group (order by ${menuIngredients.category})`,
+        category: sql<IngredientCategory>`mode() within group (order by ${menuIngredients.category})`,
         uses: sql<number>`count(*)::int`,
       })
       .from(menuIngredients)
