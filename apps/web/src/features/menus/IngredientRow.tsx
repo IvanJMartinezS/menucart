@@ -6,7 +6,8 @@ import { useFormContext, useWatch } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { useDebouncedValue } from '../../lib/use-debounced-value.ts'
 import { ingredientSuggestionsQueryOptions } from '../ingredients/queries.ts'
-import { FieldError } from './FieldError.tsx'
+import { FieldError } from '../../components/ui/FieldError.tsx'
+import { inputClassName } from '../../components/ui/form-styles.ts'
 
 type IngredientRowProps = {
   index: number
@@ -15,9 +16,6 @@ type IngredientRowProps = {
   onRemove: () => void
   canRemove: boolean
 }
-
-export const inputClassName =
-  'min-h-11 w-full rounded-xl border border-line bg-surface px-3 text-base text-ink placeholder:text-muted/70 focus:border-accent focus:ring-2 focus:ring-accent/30 focus:outline-none aria-invalid:border-accent-strong'
 
 /**
  * One ingredient of the menu: quantity, name and category.
