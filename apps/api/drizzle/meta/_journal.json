@@ -15,6 +15,13 @@
       "when": 1794359491933,
       "tag": "0001_enable_unaccent",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794517170539,
+      "tag": "0002_add_groceries",
+      "breakpoints": true
     }
   ]
 }

@@ -1,4 +1,9 @@
-import { ingredientCategories } from '@menucart/shared'
+import {
+  groceryCategories,
+  groceryFrequencies,
+  groceryUnits,
+  ingredientCategories,
+} from '@menucart/shared'
 import { relations, sql } from 'drizzle-orm'
 import {
   check,
@@ -9,6 +14,7 @@ import {
   pgTable,
   text,
   timestamp,
+  uniqueIndex,
   uuid,
 } from 'drizzle-orm/pg-core'
 
@@ -52,3 +58,34 @@ export const menusRelations = relations(menus, ({ many }) => ({
 export const menuIngredientsRelations = relations(menuIngredients, ({ one }) => ({
   menu: one(menus, { fields: [menuIngredients.menuId], references: [menus.id] }),
 }))
+
+export const groceryCategory = pgEnum('grocery_category', groceryCategories)
+export const groceryFrequency = pgEnum('grocery_frequency', groceryFrequencies)
+export const groceryUnit = pgEnum('grocery_unit', groceryUnits)
+
+/** Household groceries (pantry and deli), with the amount usually bought each time. */
+export const groceries = pgTable(
+  'groceries',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    name: text('name').notNull(),
+    category: groceryCategory('category').notNull(),
+    defaultQuantity: numeric('default_quantity', {
+      precision: 8,
+      scale: 2,
+      mode: 'number',
+    }).notNull(),
+    unit: groceryUnit('unit').notNull(),
+    frequency: groceryFrequency('frequency').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => new Date()),
+  },
+  (table) => [
+    // The same grocery cannot be saved twice, whatever its capital letters ('Arroz' = 'arroz').
+    uniqueIndex('groceries_name_unique').on(sql`lower(${table.name})`),
+    check('groceries_default_quantity_positive', sql`${table.defaultQuantity} > 0`),
+  ],
+)
