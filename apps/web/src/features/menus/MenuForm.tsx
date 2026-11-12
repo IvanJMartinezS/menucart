@@ -4,8 +4,9 @@ import { Plus } from 'lucide-react'
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
-import { FieldError } from './FieldError.tsx'
-import { IngredientRow, inputClassName } from './IngredientRow.tsx'
+import { FieldError } from '../../components/ui/FieldError.tsx'
+import { inputClassName } from '../../components/ui/form-styles.ts'
+import { IngredientRow } from './IngredientRow.tsx'
 
 type MenuFormProps = {
   /** Values to start with, when editing a menu. */
