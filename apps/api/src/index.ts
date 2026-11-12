@@ -4,6 +4,7 @@ import type { AppEnv } from './env.ts'
 import { handleError, handleNotFound } from './lib/errors.ts'
 import { cors } from './middleware/cors.ts'
 import { database } from './middleware/database.ts'
+import { groceriesRoutes } from './routes/groceries.ts'
 import { ingredientsRoutes } from './routes/ingredients.ts'
 import { menusRoutes } from './routes/menus.ts'
 
@@ -21,6 +22,7 @@ const app = new Hono<AppEnv>()
   })
   .route('/menus', menusRoutes)
   .route('/ingredients', ingredientsRoutes)
+  .route('/groceries', groceriesRoutes)
 
 app.onError(handleError)
 app.notFound(handleNotFound)
