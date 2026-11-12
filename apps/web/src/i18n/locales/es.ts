@@ -63,6 +63,14 @@ export const es = {
     saving: 'Guardando…',
     cancel: 'Cancelar',
     saveError: 'No pudimos guardar el menú. Revisa tu conexión e inténtalo de nuevo.',
+    delete: 'Borrar menú',
+    deleteDialog: {
+      title: '¿Borrar «{{name}}»?',
+      description: 'Se borrará el menú con todos sus ingredientes. No se puede deshacer.',
+      confirm: 'Sí, borrar',
+      deleting: 'Borrando…',
+      error: 'No pudimos borrar el menú. Revisa tu conexión e inténtalo de nuevo.',
+    },
     notFound: {
       title: 'Este menú no existe',
       description: 'Puede que lo hayan borrado o que la dirección no sea correcta.',

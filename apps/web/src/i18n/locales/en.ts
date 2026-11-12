@@ -65,6 +65,14 @@ export const en: typeof es = {
     saving: 'Saving…',
     cancel: 'Cancel',
     saveError: 'We could not save the menu. Check your connection and try again.',
+    delete: 'Delete menu',
+    deleteDialog: {
+      title: 'Delete “{{name}}”?',
+      description: 'The menu and all its ingredients will be deleted. This cannot be undone.',
+      confirm: 'Yes, delete',
+      deleting: 'Deleting…',
+      error: 'We could not delete the menu. Check your connection and try again.',
+    },
     notFound: {
       title: 'This menu does not exist',
       description: 'It may have been deleted, or the address is not right.',
