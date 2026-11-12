@@ -15,3 +15,13 @@ beforeEach(async () => {
     vi.fn(async () => Response.json([])),
   )
 })
+
+// jsdom does not implement `<dialog>` yet: a minimal version of what the app uses.
+if (!HTMLDialogElement.prototype.showModal) {
+  HTMLDialogElement.prototype.showModal = function showModal(this: HTMLDialogElement) {
+    this.setAttribute('open', '')
+  }
+  HTMLDialogElement.prototype.close = function close(this: HTMLDialogElement) {
+    this.removeAttribute('open')
+  }
+}
