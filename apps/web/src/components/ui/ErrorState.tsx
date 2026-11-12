@@ -6,11 +6,16 @@ type ErrorStateProps = {
   onRetry: () => void
   /** True while the retry is in progress. */
   isRetrying?: boolean
+  /**
+   * When the last retry failed (timestamp in milliseconds). Only set after a retry: the first
+   * error does not need it. Showing the time makes every attempt visible, even when it fails again.
+   */
+  lastFailedRetryAt?: number
 }
 
 /** Shown when data could not be loaded from the API. */
-export function ErrorState({ onRetry, isRetrying = false }: ErrorStateProps) {
-  const { t } = useTranslation()
+export function ErrorState({ onRetry, isRetrying = false, lastFailedRetryAt }: ErrorStateProps) {
+  const { t, i18n } = useTranslation()
 
   return (
     <div role="alert">
@@ -19,14 +24,26 @@ export function ErrorState({ onRetry, isRetrying = false }: ErrorStateProps) {
         title={t('errors.connection.title')}
         description={t('errors.connection.description')}
       >
-        <button
-          type="button"
-          onClick={onRetry}
-          disabled={isRetrying}
-          className="inline-flex min-h-11 items-center rounded-full bg-accent px-6 font-semibold text-white transition-colors hover:bg-accent-strong disabled:opacity-60"
-        >
-          {isRetrying ? t('common.loading') : t('common.retry')}
-        </button>
+        <div className="flex flex-col items-center gap-3">
+          <button
+            type="button"
+            onClick={onRetry}
+            disabled={isRetrying}
+            className="inline-flex min-h-11 items-center rounded-full bg-accent px-6 font-semibold text-white transition-colors hover:bg-accent-strong disabled:opacity-60"
+          >
+            {isRetrying ? t('common.loading') : t('common.retry')}
+          </button>
+
+          {lastFailedRetryAt !== undefined && !isRetrying && (
+            <p className="text-sm text-muted">
+              {t('errors.connection.stillFailing', {
+                time: new Intl.DateTimeFormat(i18n.language, { timeStyle: 'medium' }).format(
+                  lastFailedRetryAt,
+                ),
+              })}
+            </p>
+          )}
+        </div>
       </EmptyState>
     </div>
   )

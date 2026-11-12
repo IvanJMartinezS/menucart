@@ -13,7 +13,15 @@ const gridClassName = 'grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-co
 
 export function MenusPage() {
   const { t } = useTranslation()
-  const { data: menus, isPending, isError, refetch, isFetching } = useQuery(menusQueryOptions)
+  const {
+    data: menus,
+    isPending,
+    isError,
+    refetch,
+    isFetching,
+    errorUpdateCount,
+    errorUpdatedAt,
+  } = useQuery(menusQueryOptions)
 
   let content: ReactNode
 
@@ -29,7 +37,14 @@ export function MenusPage() {
       </div>
     )
   } else if (isError) {
-    content = <ErrorState onRetry={() => void refetch()} isRetrying={isFetching} />
+    content = (
+      <ErrorState
+        onRetry={() => void refetch()}
+        isRetrying={isFetching}
+        // More than one error means the user already tried again and it failed too.
+        lastFailedRetryAt={errorUpdateCount > 1 ? errorUpdatedAt : undefined}
+      />
+    )
   } else if (menus.length === 0) {
     content = (
       <EmptyState
