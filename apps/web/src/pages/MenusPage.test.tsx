@@ -86,3 +86,15 @@ describe('MenusPage', () => {
     expect(await screen.findByRole('alert')).toBeInTheDocument()
   })
 })
+
+describe('MenusPage catalog', () => {
+  it('shows one card per menu', async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(Response.json(menus))
+
+    renderAt('/')
+
+    const cards = await screen.findAllByRole('article')
+    expect(cards.map((card) => card.getAttribute('aria-labelledby'))).toEqual(['menu-1', 'menu-2'])
+    expect(screen.getByRole('article', { name: 'Pabellón criollo' })).toBeInTheDocument()
+  })
+})
