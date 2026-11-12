@@ -28,6 +28,8 @@ export const es = {
     description: 'Guarda tus menús una sola vez, con sus ingredientes, y elígelos cada quincena.',
     ingredientCount_one: '{{count}} ingrediente',
     ingredientCount_other: '{{count}} ingredientes',
+    moreIngredients_one: 'y {{count}} más',
+    moreIngredients_other: 'y {{count}} más',
     empty: {
       title: 'Todavía no tienes menús',
       description: 'Cuando agregues tus menús con sus ingredientes, aparecerán aquí.',

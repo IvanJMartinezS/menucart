@@ -30,6 +30,8 @@ export const en: typeof es = {
     description: 'Save your menus once, with their ingredients, and pick them every two weeks.',
     ingredientCount_one: '{{count}} ingredient',
     ingredientCount_other: '{{count}} ingredients',
+    moreIngredients_one: 'and {{count}} more',
+    moreIngredients_other: 'and {{count}} more',
     empty: {
       title: 'You have no menus yet',
       description: 'Once you add your menus with their ingredients, they will show up here.',
