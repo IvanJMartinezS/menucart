@@ -1,11 +1,12 @@
 import { type MenuIngredientInput, menuInputSchema } from '@menucart/shared'
-import { eq } from 'drizzle-orm'
+import { eq, isNull } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { HTTPException } from 'hono/http-exception'
 import { z } from 'zod'
 import type { Database } from '../db/client.ts'
 import { menuIngredients, menus } from '../db/schema.ts'
 import type { AppEnv } from '../env.ts'
+import { isConstraintViolation } from '../lib/db-errors.ts'
 import { validateJson, validateParams } from '../lib/validation.ts'
 
 type Transaction = Parameters<Parameters<Database['transaction']>[0]>[0]
@@ -38,9 +39,10 @@ const insertIngredients = (tx: Transaction, menuId: string, ingredients: MenuIng
     .returning(ingredientColumns)
 
 export const menusRoutes = new Hono<AppEnv>()
-  /** Lists every menu with its ingredients, newest first. */
+  /** Lists the menus of the catalog with their ingredients, newest first. Archived ones are left out. */
   .get('/', async (c) => {
     const result = await c.var.db.query.menus.findMany({
+      where: isNull(menus.archivedAt),
       orderBy: (menu, { desc }) => [desc(menu.createdAt)],
       with: withIngredients,
     })
@@ -118,13 +120,30 @@ export const menusRoutes = new Hono<AppEnv>()
     return c.json(menu)
   })
 
-  /** Deletes a menu. Its ingredients are deleted by the database (`ON DELETE CASCADE`). */
+  /**
+   * Removes a menu from the catalog.
+   * - Never used in a plan: it is deleted, with its ingredients (`ON DELETE CASCADE`).
+   * - Used in a plan: the database refuses to delete it (`ON DELETE RESTRICT`), so it is
+   *   archived instead. Plans keep it, and it no longer shows up in the catalog.
+   */
   .delete('/:id', validateParams(menuIdParamSchema), async (c) => {
     const { id } = c.req.valid('param')
 
-    const deleted = await c.var.db.delete(menus).where(eq(menus.id, id)).returning({ id: menus.id })
+    let removed: { id: string }[]
+    try {
+      removed = await c.var.db.delete(menus).where(eq(menus.id, id)).returning({ id: menus.id })
+    } catch (error) {
+      if (!isConstraintViolation(error, 'plan_menus_menu_id_menus_id_fk')) {
+        throw error
+      }
+      removed = await c.var.db
+        .update(menus)
+        .set({ archivedAt: new Date() })
+        .where(eq(menus.id, id))
+        .returning({ id: menus.id })
+    }
 
-    if (deleted.length === 0) {
+    if (removed.length === 0) {
       throw menuNotFound()
     }
 
