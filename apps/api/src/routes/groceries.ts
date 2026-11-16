@@ -5,7 +5,7 @@ import { HTTPException } from 'hono/http-exception'
 import { z } from 'zod'
 import { groceries } from '../db/schema.ts'
 import type { AppEnv } from '../env.ts'
-import { isUniqueViolation } from '../lib/db-errors.ts'
+import { isConstraintViolation } from '../lib/db-errors.ts'
 import { validateJson, validateParams } from '../lib/validation.ts'
 
 const groceryIdParamSchema = z.object({ id: z.uuid() })
@@ -23,7 +23,7 @@ async function rejectingDuplicates<T>(write: () => Promise<T>) {
   try {
     return await write()
   } catch (error) {
-    if (isUniqueViolation(error, 'groceries_name_unique')) {
+    if (isConstraintViolation(error, 'groceries_name_unique')) {
       throw duplicateGrocery()
     }
     throw error
