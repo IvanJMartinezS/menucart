@@ -1,17 +1,14 @@
-/** Postgres error code for a value that breaks a unique constraint. */
-const UNIQUE_VIOLATION = '23505'
-
 type PostgresError = { code?: string; constraint_name?: string }
 
 /**
- * Tells whether a database error was caused by a duplicate value in the given unique constraint.
- * Drizzle wraps the Postgres error, so it is looked for in `cause` too.
+ * Tells whether a database error was caused by the given constraint: a unique index
+ * (duplicate value), an exclusion constraint (overlapping plans) or a foreign key
+ * (a row still in use). Drizzle wraps the Postgres error, so it is looked for in `cause` too.
  */
-export function isUniqueViolation(error: unknown, constraint: string) {
+export function isConstraintViolation(error: unknown, constraint: string) {
   const candidates = [error, (error as { cause?: unknown } | null)?.cause]
 
-  return candidates.some((candidate) => {
-    const postgresError = candidate as PostgresError | null | undefined
-    return postgresError?.code === UNIQUE_VIOLATION && postgresError.constraint_name === constraint
-  })
+  return candidates.some(
+    (candidate) => (candidate as PostgresError | null | undefined)?.constraint_name === constraint,
+  )
 }
