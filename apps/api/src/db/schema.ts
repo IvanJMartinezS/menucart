@@ -30,6 +30,11 @@ export const menus = pgTable('menus', {
     .notNull()
     .defaultNow()
     .$onUpdate(() => new Date()),
+  /**
+   * When the menu was archived. A menu used in a plan is archived instead of deleted:
+   * it leaves the catalog but plans keep it, and it can be restored.
+   */
+  archivedAt: timestamp('archived_at', { withTimezone: true }),
 })
 
 export const menuIngredients = pgTable(

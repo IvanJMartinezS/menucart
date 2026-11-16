@@ -16,6 +16,7 @@ const menuWith = (names: string[]): Menu => ({
   id: 'c03af067-7989-4135-beb8-7e24a9f128ee',
   name: 'Bistec con ensalada y maduro',
   notes: null,
+  archivedAt: null,
   createdAt: '2026-11-11T12:00:00.000Z',
   updatedAt: '2026-11-11T12:00:00.000Z',
   ingredients: names.map(ingredient),
