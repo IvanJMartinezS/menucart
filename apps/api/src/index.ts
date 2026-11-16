@@ -7,6 +7,7 @@ import { database } from './middleware/database.ts'
 import { groceriesRoutes } from './routes/groceries.ts'
 import { ingredientsRoutes } from './routes/ingredients.ts'
 import { menusRoutes } from './routes/menus.ts'
+import { plansRoutes } from './routes/plans.ts'
 
 // Routes are chained so that `AppType` describes every endpoint for the typed web client.
 const app = new Hono<AppEnv>()
@@ -23,6 +24,7 @@ const app = new Hono<AppEnv>()
   .route('/menus', menusRoutes)
   .route('/ingredients', ingredientsRoutes)
   .route('/groceries', groceriesRoutes)
+  .route('/plans', plansRoutes)
 
 app.onError(handleError)
 app.notFound(handleNotFound)
