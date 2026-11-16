@@ -7,11 +7,14 @@ import {
 import { relations, sql } from 'drizzle-orm'
 import {
   check,
+  date,
   index,
   integer,
   numeric,
   pgEnum,
   pgTable,
+  primaryKey,
+  smallint,
   text,
   timestamp,
   uniqueIndex,
@@ -94,3 +97,87 @@ export const groceries = pgTable(
     check('groceries_default_quantity_positive', sql`${table.defaultQuantity} > 0`),
   ],
 )
+
+/**
+ * A plan ("quincena"): the days between two dates chosen by the user, for example from the
+ * 2nd to the 16th. Plans cannot overlap: migration `0005_prevent_overlapping_plans` adds that
+ * rule as an exclusion constraint, which the schema builder cannot express.
+ */
+export const plans = pgTable(
+  'plans',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    startDate: date('start_date', { mode: 'string' }).notNull(),
+    endDate: date('end_date', { mode: 'string' }).notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    // Between 1 and 31 days, counting both ends (subtracting dates gives the days between them).
+    check(
+      'plans_length_range',
+      sql`${table.endDate} >= ${table.startDate} and ${table.endDate} - ${table.startDate} < 31`,
+    ),
+  ],
+)
+
+/** The menus chosen for a plan. The same menu can be planned several times (`times`). */
+export const planMenus = pgTable(
+  'plan_menus',
+  {
+    planId: uuid('plan_id')
+      .notNull()
+      .references(() => plans.id, { onDelete: 'cascade' }),
+    // Menus used in a plan are archived, never deleted: the database refuses to delete them.
+    menuId: uuid('menu_id')
+      .notNull()
+      .references(() => menus.id, { onDelete: 'restrict' }),
+    times: smallint('times').notNull().default(1),
+    addedAt: timestamp('added_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.planId, table.menuId] }),
+    index('plan_menus_menu_id_idx').on(table.menuId),
+    check('plan_menus_times_range', sql`${table.times} between 1 and 31`),
+  ],
+)
+
+/**
+ * The groceries chosen for a plan, copied when they are chosen (name, category, unit and
+ * quantity): changing or deleting a grocery later never changes a plan already made.
+ */
+export const planGroceries = pgTable(
+  'plan_groceries',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    planId: uuid('plan_id')
+      .notNull()
+      .references(() => plans.id, { onDelete: 'cascade' }),
+    // Empty once the grocery is deleted from the catalog; the copied data stays.
+    groceryId: uuid('grocery_id').references(() => groceries.id, { onDelete: 'set null' }),
+    name: text('name').notNull(),
+    category: groceryCategory('category').notNull(),
+    unit: groceryUnit('unit').notNull(),
+    quantity: numeric('quantity', { precision: 8, scale: 2, mode: 'number' }).notNull(),
+    addedAt: timestamp('added_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    // A grocery is chosen at most once per plan. It also serves searches by plan_id.
+    uniqueIndex('plan_groceries_plan_grocery_unique').on(table.planId, table.groceryId),
+    check('plan_groceries_quantity_positive', sql`${table.quantity} > 0`),
+  ],
+)
+
+export const plansRelations = relations(plans, ({ many }) => ({
+  menus: many(planMenus),
+  groceries: many(planGroceries),
+}))
+
+export const planMenusRelations = relations(planMenus, ({ one }) => ({
+  plan: one(plans, { fields: [planMenus.planId], references: [plans.id] }),
+  menu: one(menus, { fields: [planMenus.menuId], references: [menus.id] }),
+}))
+
+export const planGroceriesRelations = relations(planGroceries, ({ one }) => ({
+  plan: one(plans, { fields: [planGroceries.planId], references: [plans.id] }),
+  grocery: one(groceries, { fields: [planGroceries.groceryId], references: [groceries.id] }),
+}))
