@@ -36,6 +36,13 @@
       "when": 1794870731203,
       "tag": "0004_add_plans",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1794870733943,
+      "tag": "0005_prevent_overlapping_plans",
+      "breakpoints": true
     }
   ]
 }
