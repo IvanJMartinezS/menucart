@@ -148,10 +148,6 @@ export const es = {
     eyebrow: 'Quincena',
     title: 'Arma tu quincena',
     description: 'Elige los menús de las próximas dos semanas y marca los víveres que tocan.',
-    empty: {
-      title: 'Aún no hay una quincena en curso',
-      description: 'Cuando empieces una quincena, verás aquí los menús y víveres elegidos.',
-    },
     period: '{{start}} → {{end}}',
     length_one: '{{count}} día',
     length_other: '{{count}} días',

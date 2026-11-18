@@ -1,6 +1,7 @@
 import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
+import { mockApi } from './test/mock-api.ts'
 import { renderAt } from './test/render.tsx'
 
 /** The layout has two navigations (header and bottom bar); CSS shows only one of them. */
@@ -12,10 +13,20 @@ describe('app routes', () => {
     ['/groceries', 'Lo que siempre hace falta en casa'],
     ['/plan', 'Arma tu quincena'],
     ['/shopping-list', 'Todo lo que hay que comprar'],
-  ])('shows the right page at %s', (path, title) => {
+  ])('shows the right page at %s', async (path, title) => {
+    mockApi([
+      { method: 'GET', path: '/menus', respond: () => Response.json([]) },
+      { method: 'GET', path: '/groceries', respond: () => Response.json([]) },
+      { method: 'GET', path: '/plans/current', respond: () => Response.json(null) },
+      {
+        method: 'GET',
+        path: '/plans/suggestion',
+        respond: () => Response.json({ startDate: '2026-11-17', endDate: '2026-12-01' }),
+      },
+    ])
     renderAt(path)
 
-    expect(screen.getByRole('heading', { level: 1, name: title })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { level: 1, name: title })).toBeInTheDocument()
   })
 
   it('navigates between sections and marks the current one', async () => {
