@@ -2,3 +2,4 @@
 export * from './menu.ts'
 export * from './grocery.ts'
 export * from './plan.ts'
+export * from './shopping-list.ts'
