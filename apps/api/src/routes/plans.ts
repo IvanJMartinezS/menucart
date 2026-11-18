@@ -1,4 +1,5 @@
 import {
+  buildShoppingList,
   planGroceryInputSchema,
   planInputSchema,
   planMenuInputSchema,
@@ -135,6 +136,22 @@ export const plansRoutes = new Hono<AppEnv>()
     const { id } = c.req.valid('param')
 
     return c.json(await findPlan(c.var.db, id))
+  })
+
+  /**
+   * The shopping list of a plan: menu ingredients multiplied and added up, and the checked
+   * groceries, grouped by section. The rules live in the shared package (`buildShoppingList`).
+   */
+  .get('/:id/shopping-list', validateParams(planIdParamSchema), async (c) => {
+    const { id } = c.req.valid('param')
+    const plan = await findPlan(c.var.db, id)
+
+    return c.json({
+      planId: plan.id,
+      startDate: plan.startDate,
+      endDate: plan.endDate,
+      sections: buildShoppingList({ menus: plan.menus, groceries: plan.groceries }),
+    })
   })
 
   /**
