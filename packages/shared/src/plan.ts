@@ -45,6 +45,12 @@ export function suggestNextPlan(today: string, previous?: PlanPeriod): PlanPerio
   return { startDate, endDate: addDays(startDate, DEFAULT_PLAN_DAYS - 1) }
 }
 
+/** Messages of the plan rules, exported so clients can tell them apart and translate them. */
+export const planErrors = {
+  endBeforeStart: 'A plan cannot end before it starts',
+  tooLong: `A plan lasts ${MAX_PLAN_DAYS} days at most`,
+} as const
+
 /** Data needed to create or change a plan: its first and last day. */
 export const planInputSchema = z
   .object({
@@ -52,11 +58,11 @@ export const planInputSchema = z
     endDate: z.iso.date(),
   })
   .refine((plan) => plan.endDate >= plan.startDate, {
-    message: 'A plan cannot end before it starts',
+    message: planErrors.endBeforeStart,
     path: ['endDate'],
   })
   .refine((plan) => plan.endDate < plan.startDate || planLength(plan) <= MAX_PLAN_DAYS, {
-    message: `A plan lasts ${MAX_PLAN_DAYS} days at most`,
+    message: planErrors.tooLong,
     path: ['endDate'],
   })
 
