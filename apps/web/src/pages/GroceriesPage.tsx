@@ -1,4 +1,4 @@
-import { type GroceryCategory, type GroceryFrequency, groceryCategories } from '@menucart/shared'
+import { type GroceryCategory, groceryCategories } from '@menucart/shared'
 import { useQuery } from '@tanstack/react-query'
 import { Pencil, Plus, ShoppingBasket, Trash2 } from 'lucide-react'
 import { type ReactNode, useState } from 'react'
@@ -8,6 +8,7 @@ import { EmptyState } from '../components/ui/EmptyState.tsx'
 import { ErrorState } from '../components/ui/ErrorState.tsx'
 import { PageHeader } from '../components/ui/PageHeader.tsx'
 import { formatQuantity } from '../features/groceries/format.ts'
+import { FrequencyTag } from '../features/groceries/FrequencyTag.tsx'
 import { GroceryFormDialog } from '../features/groceries/GroceryFormDialog.tsx'
 import {
   type Grocery,
@@ -17,13 +18,6 @@ import {
 
 const addButtonClassName =
   'inline-flex min-h-11 items-center gap-2 rounded-full bg-accent px-6 font-semibold text-white transition-colors hover:bg-accent-strong'
-
-/** Each frequency has its own color, so they can be told apart at a glance. */
-const frequencyClassName: Record<GroceryFrequency, string> = {
-  biweekly: 'bg-accent-soft text-accent-strong',
-  monthly: 'bg-olive/10 text-olive',
-  occasional: 'bg-line/70 text-muted',
-}
 
 /** What the form panel is showing: nothing, a new grocery or an existing one. */
 type FormTarget = { kind: 'closed' } | { kind: 'new' } | { kind: 'edit'; grocery: Grocery }
@@ -104,11 +98,7 @@ export function GroceriesPage() {
                       <span className="text-sm text-muted">
                         {formatQuantity(t, i18n.language, grocery.defaultQuantity, grocery.unit)}
                       </span>
-                      <span
-                        className={`w-fit rounded-full px-2.5 py-0.5 text-xs font-bold ${frequencyClassName[grocery.frequency]}`}
-                      >
-                        {t(`groceries.frequencies.${grocery.frequency}`)}
-                      </span>
+                      <FrequencyTag frequency={grocery.frequency} />
                     </div>
                     <button
                       type="button"
