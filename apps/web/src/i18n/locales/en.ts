@@ -150,10 +150,6 @@ export const en: typeof es = {
     eyebrow: 'Plan',
     title: 'Plan your two weeks',
     description: 'Pick the menus for the next two weeks and check the groceries you need.',
-    empty: {
-      title: 'There is no plan in progress',
-      description: 'Once you start a plan, the chosen menus and groceries will show up here.',
-    },
     period: '{{start}} → {{end}}',
     length_one: '{{count}} day',
     length_other: '{{count}} days',
