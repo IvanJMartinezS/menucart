@@ -201,9 +201,25 @@ export const en: typeof es = {
     eyebrow: 'Shopping list',
     title: 'Everything you need to buy',
     description: 'The ingredients of your menus and your groceries, added up and grouped by aisle.',
+    progress: '{{checked}} of {{total}} in the cart',
+    clear: 'Uncheck all',
+    usedIn: 'For {{menus}}',
+    check: 'I have {{name}}',
+    deviceNote: 'Checks are saved on this device.',
+    goToPlan: 'Plan your two weeks',
+    sections: {
+      vegetables: 'Vegetables',
+      meat: 'Meat',
+      deli: 'Deli',
+      pantry: 'Pantry',
+    },
+    noPlan: {
+      title: 'There is no plan yet',
+      description: 'The list builds itself once you choose the menus and groceries of the plan.',
+    },
     empty: {
       title: 'Your list is empty',
-      description: 'The list is built from your plan.',
+      description: 'Choose menus or check groceries in the plan and they will show up here.',
     },
   },
   notFound: {
