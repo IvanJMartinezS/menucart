@@ -199,9 +199,25 @@ export const es = {
     title: 'Todo lo que hay que comprar',
     description:
       'Los ingredientes de tus menús y tus víveres, sumados y agrupados como en el mercado.',
+    progress: '{{checked}} de {{total}} en el carrito',
+    clear: 'Desmarcar todo',
+    usedIn: 'Para {{menus}}',
+    check: 'Ya tengo {{name}}',
+    deviceNote: 'Las marcas se guardan en este dispositivo.',
+    goToPlan: 'Arma tu quincena',
+    sections: {
+      vegetables: 'Verduras',
+      meat: 'Carnes',
+      deli: 'Charcutería',
+      pantry: 'Víveres',
+    },
+    noPlan: {
+      title: 'Todavía no hay una quincena',
+      description: 'La lista se arma sola cuando eliges los menús y víveres de la quincena.',
+    },
     empty: {
       title: 'Tu lista está vacía',
-      description: 'La lista se arma sola a partir de la quincena.',
+      description: 'Elige menús o marca víveres en la quincena y aparecerán aquí.',
     },
   },
   notFound: {
