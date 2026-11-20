@@ -3,6 +3,7 @@ import { Hono } from 'hono'
 import type { AppEnv } from './env.ts'
 import { handleError, handleNotFound } from './lib/errors.ts'
 import { cors } from './middleware/cors.ts'
+import { csrf } from './middleware/csrf.ts'
 import { database } from './middleware/database.ts'
 import { groceriesRoutes } from './routes/groceries.ts'
 import { ingredientsRoutes } from './routes/ingredients.ts'
@@ -12,6 +13,7 @@ import { plansRoutes } from './routes/plans.ts'
 // Routes are chained so that `AppType` describes every endpoint for the typed web client.
 const app = new Hono<AppEnv>()
   .use(cors)
+  .use(csrf)
   .use(database)
   .get('/health', async (c) => {
     try {
