@@ -43,6 +43,13 @@
       "when": 1794870733943,
       "tag": "0005_prevent_overlapping_plans",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1795136042536,
+      "tag": "0006_add_users_and_sessions",
+      "breakpoints": true
     }
   ]
 }

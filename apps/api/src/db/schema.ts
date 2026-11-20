@@ -181,3 +181,65 @@ export const planGroceriesRelations = relations(planGroceries, ({ one }) => ({
   plan: one(plans, { fields: [planGroceries.planId], references: [plans.id] }),
   grocery: one(groceries, { fields: [planGroceries.groceryId], references: [groceries.id] }),
 }))
+
+/** The people who share the same menus, groceries and plans. */
+export const households = pgTable('households', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: text('name').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+})
+
+export const users = pgTable(
+  'users',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    householdId: uuid('household_id')
+      .notNull()
+      .references(() => households.id, { onDelete: 'cascade' }),
+    /** Always saved in lowercase. */
+    email: text('email').notNull(),
+    name: text('name').notNull(),
+    /** PBKDF2 hash with its own salt and iterations, never the password itself. */
+    passwordHash: text('password_hash').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    // One account per email, whatever its capital letters.
+    uniqueIndex('users_email_unique').on(sql`lower(${table.email})`),
+    index('users_household_id_idx').on(table.householdId),
+  ],
+)
+
+/**
+ * Signed-in devices. Only the SHA-256 hash of the session token is saved: whoever reads
+ * this table cannot use the sessions.
+ */
+export const sessions = pgTable(
+  'sessions',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    tokenHash: text('token_hash').notNull(),
+    expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    uniqueIndex('sessions_token_hash_unique').on(table.tokenHash),
+    index('sessions_user_id_idx').on(table.userId),
+  ],
+)
+
+export const householdsRelations = relations(households, ({ many }) => ({
+  users: many(users),
+}))
+
+export const usersRelations = relations(users, ({ one, many }) => ({
+  household: one(households, { fields: [users.householdId], references: [households.id] }),
+  sessions: many(sessions),
+}))
+
+export const sessionsRelations = relations(sessions, ({ one }) => ({
+  user: one(users, { fields: [sessions.userId], references: [users.id] }),
+}))
