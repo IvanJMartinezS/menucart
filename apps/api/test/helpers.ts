@@ -26,13 +26,18 @@ export const postJson = (path: string, body: unknown) => sendJson('POST', path, 
 
 export const putJson = (path: string, body: unknown) => sendJson('PUT', path, body)
 
-/** Empties every table so each test starts from a clean database. */
-export async function resetDatabase() {
+/** Runs SQL directly against the test database, to check or prepare what the API cannot show. */
+export async function queryDatabase<T>(run: (sql: postgres.Sql) => Promise<T>) {
   const sql = postgres(TEST_DATABASE_URL, { max: 1, onnotice: () => {} })
 
   try {
-    await sql`truncate table plans, menus, groceries cascade`
+    return await run(sql)
   } finally {
     await sql.end()
   }
+}
+
+/** Empties every table so each test starts from a clean database. */
+export function resetDatabase() {
+  return queryDatabase((sql) => sql`truncate table plans, menus, groceries, households cascade`)
 }
