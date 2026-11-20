@@ -5,6 +5,7 @@ import { handleError, handleNotFound } from './lib/errors.ts'
 import { cors } from './middleware/cors.ts'
 import { csrf } from './middleware/csrf.ts'
 import { database } from './middleware/database.ts'
+import { authRoutes } from './routes/auth.ts'
 import { groceriesRoutes } from './routes/groceries.ts'
 import { ingredientsRoutes } from './routes/ingredients.ts'
 import { menusRoutes } from './routes/menus.ts'
@@ -23,6 +24,7 @@ const app = new Hono<AppEnv>()
       return c.json({ status: 'error', database: 'down' } as const, 503)
     }
   })
+  .route('/auth', authRoutes)
   .route('/menus', menusRoutes)
   .route('/ingredients', ingredientsRoutes)
   .route('/groceries', groceriesRoutes)
