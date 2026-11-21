@@ -5,6 +5,7 @@ import { HTTPException } from 'hono/http-exception'
 import { households, users } from '../db/schema.ts'
 import type { AppEnv } from '../env.ts'
 import { isConstraintViolation } from '../lib/db-errors.ts'
+import { claimInvitation, markInvitationUsedBy } from '../lib/invitations.ts'
 import { hashPassword, verifyAgainstDummyHash, verifyPassword } from '../lib/passwords.ts'
 import {
   type Account,
@@ -21,32 +22,59 @@ import { requireAuth } from '../middleware/auth.ts'
 const invalidCredentials = () =>
   new HTTPException(401, { message: 'The email or the password is not correct' })
 
+/** Thrown inside the transaction to undo it when the invitation code does not work. */
+class InvalidInvitationError extends Error {}
+
 async function startSession(c: Context<AppEnv>, userId: string) {
   const { token, expiresAt } = await createSession(c.var.db, userId)
   setSessionCookie(c, token, expiresAt)
 }
 
 export const authRoutes = new Hono<AppEnv>()
-  /** Creates an account with its own household and signs in. */
+  /**
+   * Creates an account and signs in. Without an invitation code the user gets their own
+   * household; with a valid one, they join the household that invited them.
+   */
   .post('/register', validateJson(registerInputSchema), async (c) => {
-    const { name, email, password } = c.req.valid('json')
+    const { name, email, password, invitationCode } = c.req.valid('json')
+
     const passwordHash = await hashPassword(password)
 
     let account: Account
     try {
       account = await c.var.db.transaction(async (tx) => {
-        const [household] = await tx
-          .insert(households)
-          .values({ name })
-          .returning({ id: households.id, name: households.name })
+        const invitation = invitationCode ? await claimInvitation(tx, invitationCode) : null
+
+        if (invitationCode && !invitation) {
+          throw new InvalidInvitationError()
+        }
+
+        const [household] = invitation
+          ? await tx
+              .select({ id: households.id, name: households.name })
+              .from(households)
+              .where(eq(households.id, invitation.householdId))
+          : await tx
+              .insert(households)
+              .values({ name })
+              .returning({ id: households.id, name: households.name })
         const [user] = await tx
           .insert(users)
           .values({ householdId: household!.id, email, name, passwordHash })
           .returning({ id: users.id, name: users.name, email: users.email })
 
+        if (invitation) {
+          await markInvitationUsedBy(tx, invitation.id, user!.id)
+        }
+
         return { ...user!, household: household! }
       })
     } catch (error) {
+      if (error instanceof InvalidInvitationError) {
+        throw new HTTPException(400, {
+          message: 'The invitation code is not valid. It may have expired or been used already',
+        })
+      }
       if (isConstraintViolation(error, 'users_email_unique')) {
         throw new HTTPException(409, { message: 'An account with this email already exists' })
       }

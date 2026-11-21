@@ -7,6 +7,7 @@ import { csrf } from './middleware/csrf.ts'
 import { database } from './middleware/database.ts'
 import { authRoutes } from './routes/auth.ts'
 import { groceriesRoutes } from './routes/groceries.ts'
+import { householdsRoutes } from './routes/households.ts'
 import { ingredientsRoutes } from './routes/ingredients.ts'
 import { menusRoutes } from './routes/menus.ts'
 import { plansRoutes } from './routes/plans.ts'
@@ -25,6 +26,7 @@ const app = new Hono<AppEnv>()
     }
   })
   .route('/auth', authRoutes)
+  .route('/households', householdsRoutes)
   .route('/menus', menusRoutes)
   .route('/ingredients', ingredientsRoutes)
   .route('/groceries', groceriesRoutes)
