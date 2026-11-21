@@ -4,7 +4,7 @@ import { deleteCookie, getCookie, setCookie } from 'hono/cookie'
 import type { CookieOptions } from 'hono/utils/cookie'
 import type { Database } from '../db/client.ts'
 import { households, sessions, users } from '../db/schema.ts'
-import { toBase64Url, toHex } from './encoding.ts'
+import { sha256Hex, toBase64Url } from './encoding.ts'
 
 export const SESSION_COOKIE = 'menucart_session'
 
@@ -32,10 +32,7 @@ export function generateSessionToken() {
 }
 
 /** SHA-256 of the token: the only thing saved in the database. */
-export async function hashSessionToken(token: string) {
-  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(token))
-  return toHex(new Uint8Array(digest))
-}
+export const hashSessionToken = (token: string) => sha256Hex(token)
 
 /** Starts a session for the user and returns the token, which only the browser keeps. */
 export async function createSession(db: Database, userId: string) {
