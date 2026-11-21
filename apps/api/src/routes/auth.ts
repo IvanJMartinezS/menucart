@@ -5,6 +5,7 @@ import { HTTPException } from 'hono/http-exception'
 import { households, users } from '../db/schema.ts'
 import type { AppEnv } from '../env.ts'
 import { isConstraintViolation } from '../lib/db-errors.ts'
+import { clientOf, recordFailedAttempt, rejectIfTooManyFailures } from '../lib/failed-attempts.ts'
 import { claimInvitation, markInvitationUsedBy } from '../lib/invitations.ts'
 import { hashPassword, verifyAgainstDummyHash, verifyPassword } from '../lib/passwords.ts'
 import {
@@ -37,6 +38,10 @@ export const authRoutes = new Hono<AppEnv>()
    */
   .post('/register', validateJson(registerInputSchema), async (c) => {
     const { name, email, password, invitationCode } = c.req.valid('json')
+
+    if (invitationCode) {
+      await rejectIfTooManyFailures(c, 'invitation')
+    }
 
     const passwordHash = await hashPassword(password)
 
@@ -71,6 +76,8 @@ export const authRoutes = new Hono<AppEnv>()
       })
     } catch (error) {
       if (error instanceof InvalidInvitationError) {
+        // Counted outside the transaction, which was undone.
+        await recordFailedAttempt(c.var.db, clientOf(c), 'invitation')
         throw new HTTPException(400, {
           message: 'The invitation code is not valid. It may have expired or been used already',
         })
@@ -85,9 +92,11 @@ export const authRoutes = new Hono<AppEnv>()
     return c.json(account, 201)
   })
 
-  /** Signs in with email and password. */
+  /** Signs in with email and password. Too many wrong passwords block the client for a while. */
   .post('/login', validateJson(loginInputSchema), async (c) => {
     const { email, password } = c.req.valid('json')
+
+    await rejectIfTooManyFailures(c, 'login')
 
     const [user] = await c.var.db
       .select({
@@ -106,6 +115,7 @@ export const authRoutes = new Hono<AppEnv>()
       : await verifyAgainstDummyHash(password)
 
     if (!user || !passwordIsValid) {
+      await recordFailedAttempt(c.var.db, clientOf(c), 'login')
       throw invalidCredentials()
     }
 

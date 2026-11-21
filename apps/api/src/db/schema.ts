@@ -269,3 +269,24 @@ export const householdInvitations = pgTable(
     index('household_invitations_household_id_idx').on(table.householdId),
   ],
 )
+
+/**
+ * Recent failed attempts of actions that could be guessed by trying many times, such as
+ * invitation codes and passwords. Used to refuse more attempts for a while; old rows are
+ * deleted on the way.
+ */
+export const failedAttempts = pgTable(
+  'failed_attempts',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    /** What was tried: `invitation` or `login`. */
+    action: text('action').notNull(),
+    /** Who tried: the IP address that Cloudflare gives. */
+    client: text('client').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index('failed_attempts_lookup_idx').on(table.action, table.client, table.createdAt),
+    index('failed_attempts_created_at_idx').on(table.createdAt),
+  ],
+)

@@ -8,6 +8,7 @@ export type ErrorCode =
   | 'forbidden'
   | 'not_found'
   | 'conflict'
+  | 'too_many_requests'
   | 'internal_error'
 
 export type ValidationIssue = {
@@ -29,6 +30,7 @@ const errorCodeByStatus: Record<number, ErrorCode> = {
   403: 'forbidden',
   404: 'not_found',
   409: 'conflict',
+  429: 'too_many_requests',
 }
 
 export const handleError: ErrorHandler = (err, c) => {

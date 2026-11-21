@@ -39,5 +39,7 @@ export async function queryDatabase<T>(run: (sql: postgres.Sql) => Promise<T>) {
 
 /** Empties every table so each test starts from a clean database. */
 export function resetDatabase() {
-  return queryDatabase((sql) => sql`truncate table plans, menus, groceries, households cascade`)
+  return queryDatabase(
+    (sql) => sql`truncate table plans, menus, groceries, households, failed_attempts cascade`,
+  )
 }
