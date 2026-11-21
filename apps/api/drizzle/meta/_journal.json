@@ -57,6 +57,13 @@
       "when": 1795232735695,
       "tag": "0007_add_household_invitations",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1795232743765,
+      "tag": "0008_add_failed_attempts",
+      "breakpoints": true
     }
   ]
 }
