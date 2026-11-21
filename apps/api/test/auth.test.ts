@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { ErrorBody } from '../src/lib/errors.ts'
+import { FAILED_ATTEMPTS_WINDOW_MS, MAX_FAILED_ATTEMPTS } from '../src/lib/failed-attempts.ts'
 import { PASSWORD_ITERATIONS, verifyAgainstDummyHash } from '../src/lib/passwords.ts'
 import {
   type Account,
@@ -12,7 +13,12 @@ import { postJson, queryDatabase, request, resetDatabase } from './helpers.ts'
 // Spied on (it still runs) to know that a password is checked even when the email has no account.
 vi.mock(import('../src/lib/passwords.ts'), async (importOriginal) => {
   const actual = await importOriginal()
-  return { ...actual, verifyAgainstDummyHash: vi.fn(actual.verifyAgainstDummyHash) }
+  return {
+    ...actual,
+    verifyAgainstDummyHash: vi.fn<typeof actual.verifyAgainstDummyHash>(
+      actual.verifyAgainstDummyHash,
+    ),
+  }
 })
 
 const ana = { name: 'Ana', email: 'ana@mail.com', password: 'una clave larga' }
@@ -313,5 +319,85 @@ describe('POST /auth/logout', () => {
     const response = await request('/auth/logout', { method: 'POST' })
 
     expect(response.status).toBe(204)
+  })
+})
+
+describe('Limit of failed sign-in attempts', () => {
+  const attacker = '198.51.100.7'
+
+  const loginFrom = (ip: string, body: object) =>
+    request('/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'CF-Connecting-IP': ip },
+      body: JSON.stringify(body),
+    })
+
+  async function failTimes(ip: string, times: number) {
+    for (let attempt = 0; attempt < times; attempt++) {
+      const response = await loginFrom(ip, { email: ana.email, password: 'no es la clave' })
+      expect(response.status).toBe(401)
+    }
+  }
+
+  beforeEach(async () => {
+    await register()
+  })
+
+  it(`refuses more attempts after ${MAX_FAILED_ATTEMPTS} wrong passwords, even the right one`, async () => {
+    await failTimes(attacker, MAX_FAILED_ATTEMPTS)
+
+    const response = await loginFrom(attacker, ana)
+
+    expect(response.status).toBe(429)
+    expect(await response.json<ErrorBody>()).toEqual({
+      error: 'too_many_requests',
+      message: 'Too many failed attempts. Try again later',
+    })
+    const retryAfter = Number(response.headers.get('Retry-After'))
+    expect(retryAfter).toBeGreaterThan(0)
+    expect(retryAfter).toBeLessThanOrEqual(FAILED_ATTEMPTS_WINDOW_MS / 1000)
+    expect(sessionCookieOf(response)).toBeUndefined()
+  })
+
+  it('counts emails without account too', async () => {
+    for (let attempt = 0; attempt < MAX_FAILED_ATTEMPTS; attempt++) {
+      await loginFrom(attacker, { email: `nadie${attempt}@mail.com`, password: 'x' })
+    }
+
+    expect((await loginFrom(attacker, ana)).status).toBe(429)
+  })
+
+  it('allows the attempts left before the limit', async () => {
+    await failTimes(attacker, MAX_FAILED_ATTEMPTS - 1)
+
+    expect((await loginFrom(attacker, ana)).status).toBe(200)
+  })
+
+  it('does not limit other people', async () => {
+    await failTimes(attacker, MAX_FAILED_ATTEMPTS)
+
+    expect((await loginFrom('192.0.2.50', ana)).status).toBe(200)
+  })
+
+  it('forgets failures older than the window', async () => {
+    await failTimes(attacker, MAX_FAILED_ATTEMPTS)
+    await queryDatabase(
+      (sql) => sql`
+      update failed_attempts set created_at = now() - interval '16 minutes'`,
+    )
+
+    expect((await loginFrom(attacker, ana)).status).toBe(200)
+  })
+
+  it('keeps the limits of signing in and of invitation codes apart', async () => {
+    await failTimes(attacker, MAX_FAILED_ATTEMPTS)
+
+    const response = await request('/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'CF-Connecting-IP': attacker },
+      body: JSON.stringify({ ...ana, email: 'luis@mail.com', invitationCode: 'K7MQ4-XPN9R' }),
+    })
+
+    expect(response.status).toBe(400)
   })
 })
