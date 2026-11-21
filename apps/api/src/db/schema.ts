@@ -243,3 +243,29 @@ export const usersRelations = relations(users, ({ one, many }) => ({
 export const sessionsRelations = relations(sessions, ({ one }) => ({
   user: one(users, { fields: [sessions.userId], references: [users.id] }),
 }))
+
+/**
+ * Codes to join a household. Like sessions, only the SHA-256 hash of the code is saved.
+ * A code works once and for a short time; a newer code of the same household cancels it.
+ */
+export const householdInvitations = pgTable(
+  'household_invitations',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    householdId: uuid('household_id')
+      .notNull()
+      .references(() => households.id, { onDelete: 'cascade' }),
+    createdBy: uuid('created_by')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    codeHash: text('code_hash').notNull(),
+    expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+    usedAt: timestamp('used_at', { withTimezone: true }),
+    usedBy: uuid('used_by').references(() => users.id, { onDelete: 'set null' }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    uniqueIndex('household_invitations_code_hash_unique').on(table.codeHash),
+    index('household_invitations_household_id_idx').on(table.householdId),
+  ],
+)
