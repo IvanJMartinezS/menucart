@@ -84,6 +84,10 @@ export const groceries = pgTable(
   'groceries',
   {
     id: uuid('id').primaryKey().defaultRandom(),
+    /** Every grocery belongs to one household: only its people can see or change it. */
+    householdId: uuid('household_id')
+      .notNull()
+      .references(() => households.id, { onDelete: 'cascade' }),
     name: text('name').notNull(),
     category: groceryCategory('category').notNull(),
     defaultQuantity: numeric('default_quantity', {
@@ -100,8 +104,9 @@ export const groceries = pgTable(
       .$onUpdate(() => new Date()),
   },
   (table) => [
-    // The same grocery cannot be saved twice, whatever its capital letters ('Arroz' = 'arroz').
-    uniqueIndex('groceries_name_unique').on(sql`lower(${table.name})`),
+    // The same grocery cannot be saved twice in a household, whatever its capital letters
+    // ('Arroz' = 'arroz'). Other households can have their own. It also serves searches by household.
+    uniqueIndex('groceries_name_unique').on(table.householdId, sql`lower(${table.name})`),
     check('groceries_default_quantity_positive', sql`${table.defaultQuantity} > 0`),
   ],
 )
