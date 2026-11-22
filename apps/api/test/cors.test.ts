@@ -1,7 +1,9 @@
-import { describe, expect, it } from 'vitest'
-import { request } from './helpers.ts'
+import { beforeEach, describe, expect, it } from 'vitest'
+import { request, resetDatabaseAndSignIn } from './helpers.ts'
 
 const webOrigin = 'http://localhost:5173'
+
+beforeEach(resetDatabaseAndSignIn)
 
 describe('CORS', () => {
   it('lets the web app send requests from the browser', async () => {

@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import type { ErrorBody } from '../src/lib/errors.ts'
-import { postJson, putJson, request, resetDatabase } from './helpers.ts'
+import { postJson, putJson, request, resetDatabaseAndSignIn } from './helpers.ts'
 
 type PlanGrocery = {
   id: string
@@ -49,7 +49,7 @@ const createGrocery = async (name: string, frequency: string, defaultQuantity = 
     })
   ).json<{ id: string }>()
 
-beforeEach(resetDatabase)
+beforeEach(resetDatabaseAndSignIn)
 
 describe('POST /plans', () => {
   it('creates a plan with the chosen dates', async () => {

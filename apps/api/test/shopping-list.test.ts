@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest'
-import { postJson, putJson, request, resetDatabase } from './helpers.ts'
+import { postJson, putJson, request, resetDatabaseAndSignIn } from './helpers.ts'
 
 type ShoppingList = {
   planId: string
@@ -42,7 +42,7 @@ const createPlan = async () =>
 const shoppingList = async (planId: string) =>
   (await request(`/plans/${planId}/shopping-list`)).json<ShoppingList>()
 
-beforeEach(resetDatabase)
+beforeEach(resetDatabaseAndSignIn)
 
 describe('GET /plans/:id/shopping-list', () => {
   it('builds the list of a real plan from the database', async () => {

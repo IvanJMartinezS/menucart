@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import type { ErrorBody } from '../src/lib/errors.ts'
-import { postJson, putJson, request, resetDatabase } from './helpers.ts'
+import { postJson, putJson, request, resetDatabaseAndSignIn } from './helpers.ts'
 
 type Ingredient = {
   id: string
@@ -41,7 +41,7 @@ const createMenu = async (body: object) => (await postJson('/menus', body)).json
 /** A valid id that does not belong to any menu. */
 const missingId = '00000000-0000-4000-8000-000000000000'
 
-beforeEach(resetDatabase)
+beforeEach(resetDatabaseAndSignIn)
 
 describe('POST /menus', () => {
   it('creates a menu with its ingredients', async () => {

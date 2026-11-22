@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import type { ErrorBody } from '../src/lib/errors.ts'
-import { request, resetDatabase } from './helpers.ts'
+import { request, resetDatabaseAndSignIn } from './helpers.ts'
 
 const grocery = {
   name: 'Harina de maíz',
@@ -19,7 +19,7 @@ const createGrocery = (headers: Record<string, string>) =>
 
 const countGroceries = async () => (await (await request('/groceries')).json<unknown[]>()).length
 
-beforeEach(resetDatabase)
+beforeEach(resetDatabaseAndSignIn)
 
 describe('Protection against requests from other websites', () => {
   it('refuses writes sent from another website and saves nothing', async () => {
