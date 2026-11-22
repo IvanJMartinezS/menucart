@@ -71,6 +71,13 @@
       "when": 1795315848156,
       "tag": "0009_keep_menus_per_household",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1795315961003,
+      "tag": "0010_keep_groceries_per_household",
+      "breakpoints": true
     }
   ]
 }
