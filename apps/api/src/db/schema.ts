@@ -24,21 +24,29 @@ import {
 /** Where an ingredient shows up in the shopping list. Labels are translated in the web app. */
 export const ingredientCategory = pgEnum('ingredient_category', ingredientCategories)
 
-export const menus = pgTable('menus', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  name: text('name').notNull(),
-  notes: text('notes'),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp('updated_at', { withTimezone: true })
-    .notNull()
-    .defaultNow()
-    .$onUpdate(() => new Date()),
-  /**
-   * When the menu was archived. A menu used in a plan is archived instead of deleted:
-   * it leaves the catalog but plans keep it, and it can be restored.
-   */
-  archivedAt: timestamp('archived_at', { withTimezone: true }),
-})
+export const menus = pgTable(
+  'menus',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    /** Every menu belongs to one household: only its people can see or change it. */
+    householdId: uuid('household_id')
+      .notNull()
+      .references(() => households.id, { onDelete: 'cascade' }),
+    name: text('name').notNull(),
+    notes: text('notes'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => new Date()),
+    /**
+     * When the menu was archived. A menu used in a plan is archived instead of deleted:
+     * it leaves the catalog but plans keep it, and it can be restored.
+     */
+    archivedAt: timestamp('archived_at', { withTimezone: true }),
+  },
+  (table) => [index('menus_household_id_idx').on(table.householdId)],
+)
 
 export const menuIngredients = pgTable(
   'menu_ingredients',

@@ -64,6 +64,13 @@
       "when": 1795232743765,
       "tag": "0008_add_failed_attempts",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1795315848156,
+      "tag": "0009_keep_menus_per_household",
+      "breakpoints": true
     }
   ]
 }
