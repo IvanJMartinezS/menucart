@@ -11,6 +11,9 @@ import { sha256Hex } from './encoding.ts'
 /** How long a code works after it is created. */
 export const INVITATION_DURATION_MS = 24 * 60 * 60 * 1000
 
+/** The duration as a Postgres interval: the database dates the codes and checks them. */
+const invitationDuration = sql.raw(`interval '${INVITATION_DURATION_MS / 1000} seconds'`)
+
 /** A database client or an open transaction: both can run the queries below. */
 type Executor = Database | Parameters<Parameters<Database['transaction']>[0]>[0]
 
@@ -44,20 +47,25 @@ export const hashInvitationCode = (code: string) => sha256Hex(code)
  */
 export async function createInvitation(db: Database, householdId: string, createdBy: string) {
   const code = generateInvitationCode()
-  const expiresAt = new Date(Date.now() + INVITATION_DURATION_MS)
 
-  await db.transaction(async (tx) => {
+  // The database dates the code, with the same clock it uses to check it later.
+  const expiresAt = await db.transaction(async (tx) => {
     await tx
       .delete(householdInvitations)
       .where(
         and(eq(householdInvitations.householdId, householdId), isNull(householdInvitations.usedAt)),
       )
-    await tx.insert(householdInvitations).values({
-      householdId,
-      createdBy,
-      codeHash: await hashInvitationCode(code),
-      expiresAt,
-    })
+    const [created] = await tx
+      .insert(householdInvitations)
+      .values({
+        householdId,
+        createdBy,
+        codeHash: await hashInvitationCode(code),
+        expiresAt: sql`now() + ${invitationDuration}`,
+      })
+      .returning({ expiresAt: householdInvitations.expiresAt })
+
+    return created!.expiresAt
   })
 
   return { code: formatInvitationCode(code), expiresAt }
