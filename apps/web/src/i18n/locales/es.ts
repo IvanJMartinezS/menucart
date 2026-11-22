@@ -220,6 +220,65 @@ export const es = {
       description: 'Elige menús o marca víveres en la quincena y aparecerán aquí.',
     },
   },
+  auth: {
+    tagline: 'De tus menús a tu lista de compras.',
+    showcase: {
+      list: 'Lista de compras',
+      tomatoes: 'Tomate',
+      onions: 'Cebolla',
+      steak: 'Bistec',
+      flour: 'Harina de maíz',
+      steps: {
+        menus: 'Guarda tus menús',
+        plan: 'Arma la quincena',
+        list: 'Compra con la lista',
+      },
+    },
+    name: 'Tu nombre',
+    namePlaceholder: 'Ana',
+    email: 'Correo',
+    emailPlaceholder: 'ana@correo.com',
+    password: 'Contraseña',
+    login: {
+      eyebrow: 'Hola de nuevo',
+      title: 'Inicia sesión',
+      description: 'Entra para ver los menús y la lista de compras de tu hogar.',
+      submit: 'Entrar',
+      submitting: 'Entrando…',
+      noAccount: '¿Todavía no tienes cuenta?',
+      toRegister: 'Créala aquí',
+    },
+    register: {
+      eyebrow: 'Nueva cuenta',
+      title: 'Crea tu cuenta',
+      description:
+        'Con tu cuenta empieza tu hogar. Si alguien te invitó, escribe su código para unirte al suyo.',
+      passwordHint: 'Entre 10 y 128 caracteres.',
+      invitationCode: 'Código de invitación (opcional)',
+      invitationCodeHint:
+        'Te lo da quien ya está en el hogar. Sin código, empiezas un hogar nuevo.',
+      submit: 'Crear cuenta',
+      submitting: 'Creando…',
+      hasAccount: '¿Ya tienes cuenta?',
+      toLogin: 'Inicia sesión',
+    },
+    errors: {
+      name: 'Escribe tu nombre.',
+      email: 'Escribe un correo válido.',
+      password: 'Escribe tu contraseña.',
+      passwordLength: 'La contraseña debe tener entre 10 y 128 caracteres.',
+      invitationCode: 'El código tiene 10 letras y números, como K7MQ4-XPN9R.',
+      invalidCredentials: 'El correo o la contraseña no son correctos.',
+      emailTaken: 'Ya existe una cuenta con ese correo. Inicia sesión.',
+      invitationInvalid:
+        'Ese código no funciona: puede que haya caducado o que ya se haya usado. Pide uno nuevo.',
+      tooManyAttempts_one:
+        'Demasiados intentos fallidos. Espera {{count}} minuto y vuelve a intentarlo.',
+      tooManyAttempts_other:
+        'Demasiados intentos fallidos. Espera {{count}} minutos y vuelve a intentarlo.',
+      generic: 'No pudimos completarlo. Revisa tu conexión e inténtalo de nuevo.',
+    },
+  },
   notFound: {
     title: 'Página no encontrada',
     description: 'La dirección que buscas no existe o fue movida.',
