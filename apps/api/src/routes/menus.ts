@@ -1,17 +1,20 @@
 import { type MenuIngredientInput, menuInputSchema } from '@menucart/shared'
-import { eq, isNull } from 'drizzle-orm'
+import { and, eq, getTableColumns, isNull } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { HTTPException } from 'hono/http-exception'
 import { z } from 'zod'
 import type { Database } from '../db/client.ts'
 import { menuIngredients, menus } from '../db/schema.ts'
-import type { AppEnv } from '../env.ts'
 import { isConstraintViolation } from '../lib/db-errors.ts'
 import { validateJson, validateParams } from '../lib/validation.ts'
+import { type AuthEnv, requireAuth } from '../middleware/auth.ts'
 
 type Transaction = Parameters<Parameters<Database['transaction']>[0]>[0]
 
 const menuIdParamSchema = z.object({ id: z.uuid() })
+
+/** Columns sent to the web app: all but the household, which is always the user's own. */
+const { householdId: _householdId, ...menuColumns } = getTableColumns(menus)
 
 const ingredientColumns = {
   id: menuIngredients.id,
@@ -31,6 +34,10 @@ const withIngredients = {
 
 const menuNotFound = () => new HTTPException(404, { message: 'Menu not found' })
 
+/** The menu with this id, only if it belongs to the household. */
+const ownMenu = (householdId: string, id: string) =>
+  and(eq(menus.id, id), eq(menus.householdId, householdId))
+
 /** Saves the ingredients of a menu, keeping their order as `position`. */
 const insertIngredients = (tx: Transaction, menuId: string, ingredients: MenuIngredientInput[]) =>
   tx
@@ -38,11 +45,15 @@ const insertIngredients = (tx: Transaction, menuId: string, ingredients: MenuIng
     .values(ingredients.map((ingredient, position) => ({ ...ingredient, menuId, position })))
     .returning(ingredientColumns)
 
-export const menusRoutes = new Hono<AppEnv>()
+/** The menus of the signed-in user's household. A menu of another household answers 404. */
+export const menusRoutes = new Hono<AuthEnv>()
+  .use(requireAuth)
+
   /** Lists the menus of the catalog with their ingredients, newest first. Archived ones are left out. */
   .get('/', async (c) => {
     const result = await c.var.db.query.menus.findMany({
-      where: isNull(menus.archivedAt),
+      columns: { householdId: false },
+      where: and(eq(menus.householdId, c.var.account.household.id), isNull(menus.archivedAt)),
       orderBy: (menu, { desc }) => [desc(menu.createdAt)],
       with: withIngredients,
     })
@@ -55,7 +66,8 @@ export const menusRoutes = new Hono<AppEnv>()
     const { id } = c.req.valid('param')
 
     const menu = await c.var.db.query.menus.findFirst({
-      where: eq(menus.id, id),
+      columns: { householdId: false },
+      where: ownMenu(c.var.account.household.id, id),
       with: withIngredients,
     })
 
@@ -73,8 +85,12 @@ export const menusRoutes = new Hono<AppEnv>()
     const menu = await c.var.db.transaction(async (tx) => {
       const [created] = await tx
         .insert(menus)
-        .values({ name: input.name, notes: input.notes })
-        .returning()
+        .values({
+          householdId: c.var.account.household.id,
+          name: input.name,
+          notes: input.notes,
+        })
+        .returning(menuColumns)
 
       if (!created) {
         throw new Error('The menu was not created')
@@ -100,8 +116,8 @@ export const menusRoutes = new Hono<AppEnv>()
       const [updated] = await tx
         .update(menus)
         .set({ name: input.name, notes: input.notes ?? null })
-        .where(eq(menus.id, id))
-        .returning()
+        .where(ownMenu(c.var.account.household.id, id))
+        .returning(menuColumns)
 
       if (!updated) {
         return undefined
@@ -128,10 +144,11 @@ export const menusRoutes = new Hono<AppEnv>()
    */
   .delete('/:id', validateParams(menuIdParamSchema), async (c) => {
     const { id } = c.req.valid('param')
+    const where = ownMenu(c.var.account.household.id, id)
 
     let removed: { id: string }[]
     try {
-      removed = await c.var.db.delete(menus).where(eq(menus.id, id)).returning({ id: menus.id })
+      removed = await c.var.db.delete(menus).where(where).returning({ id: menus.id })
     } catch (error) {
       if (!isConstraintViolation(error, 'plan_menus_menu_id_menus_id_fk')) {
         throw error
@@ -139,7 +156,7 @@ export const menusRoutes = new Hono<AppEnv>()
       removed = await c.var.db
         .update(menus)
         .set({ archivedAt: new Date() })
-        .where(eq(menus.id, id))
+        .where(where)
         .returning({ id: menus.id })
     }
 
