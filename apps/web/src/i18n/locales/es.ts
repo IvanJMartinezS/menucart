@@ -17,6 +17,7 @@ export const es = {
     groceries: 'Víveres',
     plan: 'Quincena',
     shoppingList: 'Lista',
+    household: 'Mi hogar',
   },
   language: {
     label: 'Idioma',
@@ -278,6 +279,33 @@ export const es = {
         'Demasiados intentos fallidos. Espera {{count}} minutos y vuelve a intentarlo.',
       generic: 'No pudimos completarlo. Revisa tu conexión e inténtalo de nuevo.',
     },
+  },
+  household: {
+    eyebrow: 'Mi hogar',
+    title: 'El hogar de {{name}}',
+    description: 'Las personas de tu hogar comparten los menús, los víveres y la lista de compras.',
+    members: 'Quiénes están',
+    you: 'tú',
+    invite: {
+      title: 'Invitar a alguien',
+      description:
+        'Crea un código para que otra persona se una al crear su cuenta. Sirve una sola vez y dura 24 horas.',
+      create: 'Crear código',
+      creating: 'Creando…',
+      createAnother: 'Crear otro código',
+      replaces: 'Crear otro anula el anterior.',
+      code: 'Código de invitación',
+      expires: 'Caduca el {{date}}',
+      copy: 'Copiar enlace',
+      copied: '¡Enlace copiado!',
+      share: 'Compartir por WhatsApp',
+      shareText:
+        '{{name}} te invita a su hogar en MenuCart. Crea tu cuenta aquí: {{link}} (código {{code}}, vale 24 horas).',
+      error: 'No pudimos crear el código. Revisa tu conexión e inténtalo de nuevo.',
+    },
+    logout: 'Cerrar sesión',
+    loggingOut: 'Cerrando…',
+    logoutError: 'No pudimos cerrar la sesión. Revisa tu conexión e inténtalo de nuevo.',
   },
   notFound: {
     title: 'Página no encontrada',

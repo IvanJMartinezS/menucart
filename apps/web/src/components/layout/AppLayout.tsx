@@ -1,3 +1,4 @@
+import { House } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Link, NavLink, Outlet } from 'react-router'
 import { LanguageSwitcher } from './LanguageSwitcher.tsx'
@@ -41,6 +42,18 @@ export function AppLayout() {
               </ul>
             </nav>
 
+            <NavLink
+              to="/household"
+              aria-label={t('nav.household')}
+              title={t('nav.household')}
+              className={({ isActive }) =>
+                `flex size-10 items-center justify-center rounded-full transition-colors ${
+                  isActive ? 'bg-ink text-cream' : 'text-muted hover:bg-line/60 hover:text-ink'
+                }`
+              }
+            >
+              <House aria-hidden="true" className="size-5" strokeWidth={1.75} />
+            </NavLink>
             <LanguageSwitcher />
           </div>
         </div>
