@@ -1,15 +1,25 @@
 import { Navigate, type RouteObject } from 'react-router'
 import { AppLayout } from './components/layout/AppLayout.tsx'
+import { AuthLayout } from './components/layout/AuthLayout.tsx'
 import { EditMenuPage } from './pages/EditMenuPage.tsx'
 import { GroceriesPage } from './pages/GroceriesPage.tsx'
+import { LoginPage } from './pages/LoginPage.tsx'
 import { MenusPage } from './pages/MenusPage.tsx'
 import { NewMenuPage } from './pages/NewMenuPage.tsx'
 import { NotFoundPage } from './pages/NotFoundPage.tsx'
 import { PlanPage } from './pages/PlanPage.tsx'
+import { RegisterPage } from './pages/RegisterPage.tsx'
 import { ShoppingListPage } from './pages/ShoppingListPage.tsx'
 
 /** Every page of the app. Shared by the browser router and the tests. */
 export const routes: RouteObject[] = [
+  {
+    element: <AuthLayout />,
+    children: [
+      { path: 'login', element: <LoginPage /> },
+      { path: 'register', element: <RegisterPage /> },
+    ],
+  },
   {
     element: <AppLayout />,
     children: [
