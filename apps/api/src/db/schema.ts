@@ -113,13 +113,18 @@ export const groceries = pgTable(
 
 /**
  * A plan ("quincena"): the days between two dates chosen by the user, for example from the
- * 2nd to the 16th. Plans cannot overlap: migration `0005_prevent_overlapping_plans` adds that
- * rule as an exclusion constraint, which the schema builder cannot express.
+ * 2nd to the 16th. Plans of a household cannot overlap: migrations
+ * `0005_prevent_overlapping_plans` and `0011_keep_plans_per_household` add that rule as an
+ * exclusion constraint, which the schema builder cannot express.
  */
 export const plans = pgTable(
   'plans',
   {
     id: uuid('id').primaryKey().defaultRandom(),
+    /** Every plan belongs to one household: only its people can see or change it. */
+    householdId: uuid('household_id')
+      .notNull()
+      .references(() => households.id, { onDelete: 'cascade' }),
     startDate: date('start_date', { mode: 'string' }).notNull(),
     endDate: date('end_date', { mode: 'string' }).notNull(),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
