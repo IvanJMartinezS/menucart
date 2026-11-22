@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import type { ErrorBody } from '../src/lib/errors.ts'
-import { postJson, request, resetDatabase } from './helpers.ts'
+import { postJson, request, resetDatabaseAndSignIn } from './helpers.ts'
 
 type Suggestion = { name: string; category: string; uses: number }
 
@@ -12,7 +12,7 @@ const suggest = async (query: string) => {
 const names = async (query: string) => (await suggest(query)).body.map(({ name }) => name)
 
 beforeEach(async () => {
-  await resetDatabase()
+  await resetDatabaseAndSignIn()
 
   await postJson('/menus', {
     name: 'Bistec encebollado',
