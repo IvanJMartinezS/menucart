@@ -19,6 +19,7 @@ export const en: typeof es = {
     groceries: 'Groceries',
     plan: 'Plan',
     shoppingList: 'List',
+    household: 'My household',
   },
   language: {
     label: 'Language',
@@ -278,6 +279,34 @@ export const en: typeof es = {
       tooManyAttempts_other: 'Too many failed attempts. Wait {{count}} minutes and try again.',
       generic: 'We could not finish it. Check your connection and try again.',
     },
+  },
+  household: {
+    eyebrow: 'My household',
+    title: '{{name}}’s household',
+    description:
+      'The people of your household share the menus, the groceries and the shopping list.',
+    members: 'Who is in',
+    you: 'you',
+    invite: {
+      title: 'Invite someone',
+      description:
+        'Create a code so another person joins when they create their account. It works once and for 24 hours.',
+      create: 'Create code',
+      creating: 'Creating…',
+      createAnother: 'Create another code',
+      replaces: 'Creating another one cancels the previous one.',
+      code: 'Invitation code',
+      expires: 'Expires on {{date}}',
+      copy: 'Copy link',
+      copied: 'Link copied!',
+      share: 'Share on WhatsApp',
+      shareText:
+        '{{name}} invites you to their household on MenuCart. Create your account here: {{link}} (code {{code}}, valid for 24 hours).',
+      error: 'We could not create the code. Check your connection and try again.',
+    },
+    logout: 'Sign out',
+    loggingOut: 'Signing out…',
+    logoutError: 'We could not sign out. Check your connection and try again.',
   },
   notFound: {
     title: 'Page not found',

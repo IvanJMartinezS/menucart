@@ -1,6 +1,7 @@
 import type { loginInputSchema, registerInputSchema } from '@menucart/shared'
 import { queryOptions, useMutation, useQueryClient } from '@tanstack/react-query'
 import type { InferResponseType } from 'hono/client'
+import { useNavigate } from 'react-router'
 import type { z } from 'zod'
 import { ApiError, api } from '../../lib/api.ts'
 
@@ -77,11 +78,12 @@ export function useRegister() {
 }
 
 /**
- * Signs out this device. Every cached piece of data is forgotten, so whoever uses the browser
- * next sees nothing of the household.
+ * Signs out this device and goes to the sign-in page. Every cached piece of data is forgotten,
+ * so whoever uses the browser next sees nothing of the household.
  */
 export function useLogout() {
   const queryClient = useQueryClient()
+  const navigate = useNavigate()
 
   return useMutation({
     mutationFn: async () => {
@@ -92,6 +94,9 @@ export function useLogout() {
       }
     },
     onSuccess: () => {
+      // Leaving first: otherwise the protected page would send to the sign-in page asking to
+      // come back to it, and the next person would land on it.
+      void navigate('/login', { replace: true })
       queryClient.clear()
       queryClient.setQueryData(accountQueryKey, null)
     },

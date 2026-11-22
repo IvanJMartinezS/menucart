@@ -4,6 +4,7 @@ import { AuthLayout } from './components/layout/AuthLayout.tsx'
 import { RedirectIfSignedIn, RequireAccount } from './features/auth/RequireAccount.tsx'
 import { EditMenuPage } from './pages/EditMenuPage.tsx'
 import { GroceriesPage } from './pages/GroceriesPage.tsx'
+import { HouseholdPage } from './pages/HouseholdPage.tsx'
 import { LoginPage } from './pages/LoginPage.tsx'
 import { MenusPage } from './pages/MenusPage.tsx'
 import { NewMenuPage } from './pages/NewMenuPage.tsx'
@@ -40,6 +41,7 @@ export const routes: RouteObject[] = [
           { path: 'groceries', element: <GroceriesPage /> },
           { path: 'plan', element: <PlanPage /> },
           { path: 'shopping-list', element: <ShoppingListPage /> },
+          { path: 'household', element: <HouseholdPage /> },
           { path: '*', element: <NotFoundPage /> },
         ],
       },
