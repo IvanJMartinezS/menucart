@@ -90,11 +90,11 @@ cp apps/api/.dev.vars.example apps/api/.dev.vars    # API: conexión a la base d
 cp apps/web/.env.example apps/web/.env.local        # web: dónde está la API
 ```
 
-| Variable       | Dónde                     | Descripción                                                                           |
-| -------------- | ------------------------- | ------------------------------------------------------------------------------------- |
-| `DATABASE_URL` | `apps/api/.dev.vars`      | Cadena de conexión a Postgres                                                         |
-| `CORS_ORIGIN`  | `apps/api/wrangler.jsonc` | Orígenes de la web que pueden llamar a la API desde un navegador, separados por comas |
-| `VITE_API_URL` | `apps/web/.env.local`     | URL de la API que usa la web                                                          |
+| Variable       | Dónde                     | Descripción                                                                                                     |
+| -------------- | ------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `DATABASE_URL` | `apps/api/.dev.vars`      | Cadena de conexión a Postgres                                                                                   |
+| `CORS_ORIGIN`  | `apps/api/wrangler.jsonc` | Orígenes de la web que pueden llamar a la API desde un navegador, separados por comas                           |
+| `VITE_API_URL` | `apps/web/.env.local`     | Dónde llama la web a la API: `/api`, que Vite reenvía a la API (mismo origen, así funciona la cookie de sesión) |
 
 ### Base de datos local
 

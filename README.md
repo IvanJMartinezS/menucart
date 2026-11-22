@@ -89,11 +89,11 @@ cp apps/api/.dev.vars.example apps/api/.dev.vars    # API: database connection
 cp apps/web/.env.example apps/web/.env.local        # web: where the API is
 ```
 
-| Variable       | Where                     | Description                                                             |
-| -------------- | ------------------------- | ----------------------------------------------------------------------- |
-| `DATABASE_URL` | `apps/api/.dev.vars`      | Postgres connection string                                              |
-| `CORS_ORIGIN`  | `apps/api/wrangler.jsonc` | Web app origins allowed to call the API from a browser, comma separated |
-| `VITE_API_URL` | `apps/web/.env.local`     | URL of the API used by the web app                                      |
+| Variable       | Where                     | Description                                                                                                        |
+| -------------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `DATABASE_URL` | `apps/api/.dev.vars`      | Postgres connection string                                                                                         |
+| `CORS_ORIGIN`  | `apps/api/wrangler.jsonc` | Web app origins allowed to call the API from a browser, comma separated                                            |
+| `VITE_API_URL` | `apps/web/.env.local`     | Where the web app calls the API: `/api`, which Vite forwards to the API (same origin, so the session cookie works) |
 
 ### Local database
 
