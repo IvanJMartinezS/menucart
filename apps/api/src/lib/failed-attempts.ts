@@ -1,5 +1,5 @@
 import { and, eq, gt, lt, sql } from 'drizzle-orm'
-import type { Context } from 'hono'
+import type { Context, Input } from 'hono'
 import { HTTPException } from 'hono/http-exception'
 import type { Database } from '../db/client.ts'
 import { failedAttempts } from '../db/schema.ts'
@@ -17,7 +17,7 @@ export const FAILED_ATTEMPTS_WINDOW_MS = 15 * 60 * 1000
  */
 const window = sql.raw(`interval '${FAILED_ATTEMPTS_WINDOW_MS / 1000} seconds'`)
 
-export type LimitedAction = 'invitation' | 'login'
+export type LimitedAction = 'invitation' | 'login' | 'password'
 
 /**
  * Who is trying. Cloudflare sets `CF-Connecting-IP` to the real address of the client and
@@ -28,8 +28,13 @@ export const clientOf = (c: Context) => c.req.header('CF-Connecting-IP') ?? 'unk
 /**
  * Answers 429 Too Many Requests when the client has failed the action too many times lately,
  * telling in `Retry-After` how many seconds to wait until the oldest failure stops counting.
+ * The client is the IP address, unless another one is given (for example, an account).
  */
-export async function rejectIfTooManyFailures(c: Context<AppEnv>, action: LimitedAction) {
+export async function rejectIfTooManyFailures<E extends AppEnv, P extends string, I extends Input>(
+  c: Context<E, P, I>,
+  action: LimitedAction,
+  client = clientOf(c),
+) {
   const [recent] = await c.var.db
     .select({
       failures: sql<number>`count(*)::int`,
@@ -41,7 +46,7 @@ export async function rejectIfTooManyFailures(c: Context<AppEnv>, action: Limite
     .where(
       and(
         eq(failedAttempts.action, action),
-        eq(failedAttempts.client, clientOf(c)),
+        eq(failedAttempts.client, client),
         gt(failedAttempts.createdAt, sql`now() - ${window}`),
       ),
     )

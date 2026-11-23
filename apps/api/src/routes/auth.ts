@@ -1,8 +1,8 @@
-import { loginInputSchema, registerInputSchema } from '@menucart/shared'
+import { changePasswordInputSchema, loginInputSchema, registerInputSchema } from '@menucart/shared'
 import { eq, sql } from 'drizzle-orm'
 import { type Context, Hono } from 'hono'
 import { HTTPException } from 'hono/http-exception'
-import { households, users } from '../db/schema.ts'
+import { households, sessions, users } from '../db/schema.ts'
 import type { AppEnv } from '../env.ts'
 import { isConstraintViolation } from '../lib/db-errors.ts'
 import { clientOf, recordFailedAttempt, rejectIfTooManyFailures } from '../lib/failed-attempts.ts'
@@ -144,3 +144,41 @@ export const authRoutes = new Hono<AppEnv>()
 
   /** The signed-in user and their household. */
   .get('/me', requireAuth, (c) => c.json(c.var.account, 200))
+
+  /**
+   * Changes the password of the signed-in user, who must give the current one.
+   * - A wrong current password answers 400, not 401: the web app reads 401 as "the session is
+   *   over" and would sign the user out for a typo.
+   * - Failures are limited per account, not per IP: the risk is someone with the session open
+   *   (a forgotten phone) trying to guess the password to keep the account.
+   * - Afterwards every session of the user ends and this device gets a new one, so whoever knew
+   *   the old password or had another session open is left out.
+   */
+  .put('/password', requireAuth, validateJson(changePasswordInputSchema), async (c) => {
+    const { currentPassword, newPassword } = c.req.valid('json')
+    const userId = c.var.account.id
+    const client = `user:${userId}`
+
+    await rejectIfTooManyFailures(c, 'password', client)
+
+    const [user] = await c.var.db
+      .select({ passwordHash: users.passwordHash })
+      .from(users)
+      .where(eq(users.id, userId))
+
+    if (!user || !(await verifyPassword(currentPassword, user.passwordHash))) {
+      await recordFailedAttempt(c.var.db, client, 'password')
+      throw new HTTPException(400, { message: 'The current password is not correct' })
+    }
+
+    const passwordHash = await hashPassword(newPassword)
+
+    const session = await c.var.db.transaction(async (tx) => {
+      await tx.update(users).set({ passwordHash }).where(eq(users.id, userId))
+      await tx.delete(sessions).where(eq(sessions.userId, userId))
+      return createSession(tx, userId)
+    })
+
+    setSessionCookie(c, session.token, session.expiresAt)
+    return c.body(null, 204)
+  })

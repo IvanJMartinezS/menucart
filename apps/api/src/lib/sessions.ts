@@ -2,7 +2,7 @@ import { eq } from 'drizzle-orm'
 import type { Context } from 'hono'
 import { deleteCookie, getCookie, setCookie } from 'hono/cookie'
 import type { CookieOptions } from 'hono/utils/cookie'
-import type { Database } from '../db/client.ts'
+import type { Database, Executor } from '../db/client.ts'
 import { households, sessions, users } from '../db/schema.ts'
 import { sha256Hex, toBase64Url } from './encoding.ts'
 
@@ -34,8 +34,11 @@ export function generateSessionToken() {
 /** SHA-256 of the token: the only thing saved in the database. */
 export const hashSessionToken = (token: string) => sha256Hex(token)
 
-/** Starts a session for the user and returns the token, which only the browser keeps. */
-export async function createSession(db: Database, userId: string) {
+/**
+ * Starts a session for the user and returns the token, which only the browser keeps.
+ * It can run inside a transaction, to replace the sessions of a user all at once.
+ */
+export async function createSession(db: Executor, userId: string) {
   const token = generateSessionToken()
   const expiresAt = new Date(Date.now() + SESSION_DURATION_MS)
 

@@ -3,13 +3,11 @@ import { and, eq, getTableColumns, isNull } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { HTTPException } from 'hono/http-exception'
 import { z } from 'zod'
-import type { Database } from '../db/client.ts'
+import type { Database, Transaction } from '../db/client.ts'
 import { menuIngredients, menus } from '../db/schema.ts'
 import { isConstraintViolation } from '../lib/db-errors.ts'
 import { validateJson, validateParams } from '../lib/validation.ts'
 import { type AuthEnv, requireAuth } from '../middleware/auth.ts'
-
-type Transaction = Parameters<Parameters<Database['transaction']>[0]>[0]
 
 const menuIdParamSchema = z.object({ id: z.uuid() })
 

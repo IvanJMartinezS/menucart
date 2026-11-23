@@ -23,3 +23,9 @@ export function createDb(databaseUrl: string) {
 }
 
 export type Database = ReturnType<typeof createDb>['db']
+
+/** An open transaction, as received inside `db.transaction(async (tx) => …)`. */
+export type Transaction = Parameters<Parameters<Database['transaction']>[0]>[0]
+
+/** A database client or an open transaction: both can run the same queries. */
+export type Executor = Database | Transaction
