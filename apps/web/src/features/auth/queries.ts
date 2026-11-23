@@ -1,4 +1,4 @@
-import type { loginInputSchema, registerInputSchema } from '@menucart/shared'
+import type { ChangePasswordInput, loginInputSchema, registerInputSchema } from '@menucart/shared'
 import { queryOptions, useMutation, useQueryClient } from '@tanstack/react-query'
 import type { InferResponseType } from 'hono/client'
 import { useNavigate } from 'react-router'
@@ -74,6 +74,23 @@ export function useRegister() {
       return response.json()
     },
     onSuccess: (account) => queryClient.setQueryData(accountQueryKey, account),
+  })
+}
+
+/**
+ * Changes the password. The API signs out the other devices and renews the session of this one
+ * (a new cookie), so nothing changes in the cache. Fails with an `ApiError`: 400 when the current
+ * password is wrong, 429 after too many attempts.
+ */
+export function useChangePassword() {
+  return useMutation({
+    mutationFn: async (input: ChangePasswordInput) => {
+      const response = await api.auth.password.$put({ json: input })
+
+      if (!response.ok) {
+        throw ApiError.from(response)
+      }
+    },
   })
 }
 
