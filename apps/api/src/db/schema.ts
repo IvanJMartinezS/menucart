@@ -297,9 +297,9 @@ export const failedAttempts = pgTable(
   'failed_attempts',
   {
     id: uuid('id').primaryKey().defaultRandom(),
-    /** What was tried: `invitation` or `login`. */
+    /** What was tried: `invitation`, `login` or `password`. */
     action: text('action').notNull(),
-    /** Who tried: the IP address that Cloudflare gives. */
+    /** Who tried: the IP address that Cloudflare gives, or `user:<id>` for an account. */
     client: text('client').notNull(),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },

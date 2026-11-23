@@ -4,7 +4,7 @@ import {
   INVITATION_CODE_LENGTH,
 } from '@menucart/shared'
 import { and, eq, gt, isNull, sql } from 'drizzle-orm'
-import type { Database } from '../db/client.ts'
+import type { Database, Executor } from '../db/client.ts'
 import { householdInvitations } from '../db/schema.ts'
 import { sha256Hex } from './encoding.ts'
 
@@ -13,9 +13,6 @@ export const INVITATION_DURATION_MS = 24 * 60 * 60 * 1000
 
 /** The duration as a Postgres interval: the database dates the codes and checks them. */
 const invitationDuration = sql.raw(`interval '${INVITATION_DURATION_MS / 1000} seconds'`)
-
-/** A database client or an open transaction: both can run the queries below. */
-type Executor = Database | Parameters<Parameters<Database['transaction']>[0]>[0]
 
 /**
  * A new random code from a secure generator. Bytes that would favor some characters
