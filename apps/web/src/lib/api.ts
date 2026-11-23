@@ -1,10 +1,13 @@
 import type { AppType } from '@menucart/api'
 import { hc } from 'hono/client'
+import { apiUrlProblem } from './api-url.ts'
 
 const baseUrl = import.meta.env.VITE_API_URL
+const problem = apiUrlProblem(baseUrl)
 
-if (!baseUrl) {
-  throw new Error('VITE_API_URL is not set. Copy apps/web/.env.example to apps/web/.env.local.')
+// Also checked when Vite starts (vite.config.ts); this catches it if it got this far anyway.
+if (problem) {
+  throw new Error(problem)
 }
 
 /**
