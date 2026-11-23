@@ -59,5 +59,26 @@ export const loginInputSchema = z.object({
   password: z.string().min(1).max(PASSWORD_MAX_LENGTH),
 })
 
+/** Messages of the password rules, exported so clients can tell them apart and translate them. */
+export const changePasswordErrors = {
+  samePassword: 'The new password must be different from the current one',
+} as const
+
+/**
+ * Data needed to change the password: the current one, to prove it is really the user, and the
+ * new one, with the same rules as when registering. Like signing in, the current one is only
+ * checked against its maximum length.
+ */
+export const changePasswordInputSchema = z
+  .object({
+    currentPassword: z.string().min(1).max(PASSWORD_MAX_LENGTH),
+    newPassword: z.string().min(PASSWORD_MIN_LENGTH).max(PASSWORD_MAX_LENGTH),
+  })
+  .refine((input) => input.newPassword !== input.currentPassword, {
+    message: changePasswordErrors.samePassword,
+    path: ['newPassword'],
+  })
+
 export type RegisterInput = z.infer<typeof registerInputSchema>
 export type LoginInput = z.infer<typeof loginInputSchema>
+export type ChangePasswordInput = z.infer<typeof changePasswordInputSchema>
