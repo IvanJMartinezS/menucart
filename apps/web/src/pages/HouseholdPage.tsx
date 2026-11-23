@@ -3,11 +3,12 @@ import { LogOut, UserRound } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { ErrorState } from '../components/ui/ErrorState.tsx'
 import { PageHeader } from '../components/ui/PageHeader.tsx'
+import { ChangePasswordForm } from '../features/auth/ChangePasswordForm.tsx'
 import { accountQueryOptions, useLogout } from '../features/auth/queries.ts'
 import { InvitePanel } from '../features/household/InvitePanel.tsx'
 import { householdQueryOptions } from '../features/household/queries.ts'
 
-/** Who shares the household, inviting the second person, and signing out. */
+/** Who shares the household, inviting the second person, the password and signing out. */
 export function HouseholdPage() {
   const { t } = useTranslation()
   // Always there: this page is behind `RequireAccount`.
@@ -63,6 +64,8 @@ export function HouseholdPage() {
         </section>
 
         <InvitePanel inviterName={account?.name ?? ''} />
+
+        <ChangePasswordForm />
 
         <div className="flex flex-col items-start gap-3">
           {logout.isError && (
