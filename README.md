@@ -58,6 +58,13 @@ menucart/
     └── shared/     # Zod schemas, types and domain logic shared by web and api
 ```
 
+## Architecture
+
+- [Architecture overview](docs/ARCHITECTURE.md): how the packages fit together, a request through the API,
+  the data model and the tests, with diagrams.
+- [Architecture decision records](docs/adr/README.md): why the main choices were made, and what was left
+  out.
+
 ## Getting started
 
 **Requirements:** Node.js 22 or later (24 recommended, see `.nvmrc`), pnpm 11 and Docker (for the local
