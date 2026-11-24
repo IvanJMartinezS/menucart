@@ -59,6 +59,15 @@ menucart/
     └── shared/     # Esquemas Zod, tipos y lógica de dominio compartidos por web y api
 ```
 
+## Arquitectura
+
+La documentación de arquitectura está en inglés:
+
+- [Visión general](docs/ARCHITECTURE.md): cómo encajan los paquetes, el recorrido de una petición por la
+  API, el modelo de datos y los tests, con diagramas.
+- [Registros de decisiones (ADR)](docs/adr/README.md): por qué se tomaron las decisiones principales y qué
+  se descartó.
+
 ## Cómo ejecutarlo
 
 **Requisitos:** Node.js 22 o superior (se recomienda 24, ver `.nvmrc`), pnpm 11 y Docker (para la base de
